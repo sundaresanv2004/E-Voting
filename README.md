@@ -16,7 +16,7 @@ This app only runs on Mac and Windows-10/(later)
 
 ### Install Previous version (v-5.05)
 
-[Get Here](https://drive.google.com/file/d/1RxOaGN34cYbueQXBrhgkCIjXlFY8uEXO/view?usp=sharing)
+[Get Here](https://drive.google.com/file/d/1RxOaGN34cYbueQXBrhgkCIjXlFY8uEXO/view?usp=sharing) __This version doesn't required a firebase connection it runs on local system.__
 
 ### Connect Firebase
 
