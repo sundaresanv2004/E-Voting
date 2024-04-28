@@ -5,7 +5,7 @@ E-Voting v-6.01 is an election application designed for desktop and laptop compu
 
 ### Installation
 
-To install E-Voting, follow these simple steps:
+To install E-Voting v-6.01, follow these simple steps:
 
 Note: You need python-3.10 or later version installed in your system.
 This app only runs on Mac and Windows-10/(later)
@@ -13,6 +13,10 @@ This app only runs on Mac and Windows-10/(later)
 1. Clone the repository to your local machine.
 2. Install the libraries from requirements.txt file.
 3. Run the main.py file.
+
+### Install Previous version (v-5.05)
+
+[Get Here](https://drive.google.com/file/d/1RxOaGN34cYbueQXBrhgkCIjXlFY8uEXO/view?usp=sharing)
 
 ### Connect Firebase
 

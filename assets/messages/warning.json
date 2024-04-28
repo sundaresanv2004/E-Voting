@@ -12,5 +12,6 @@
   "Something went wrong": "Oops! Something went wrong. Please try again later or \nplease reach out to the election department.",
   "Option is locked": "To ensure the integrity of the election, certain \noptions are locked and cannot be accessed.",
   "Enable Vote": "To enable voting, it is necessary to generate the final nomination list. \n\nNote that to access the nomination generation feature, you must lock the data first.",
-  "Forgot Code?": "You don't have access to this option.\n Contact your domain admin for help."
+  "Forgot Code?": "You don't have access to this option.\n Contact your domain admin for help.",
+  "EmailAlreadyExistsError" : "The user with the provided email already exists (EMAIL_EXISTS)!"
 }

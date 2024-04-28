@@ -58,8 +58,8 @@ def main(page: ft.Page):
     )
 
     page.add(bg_container)
-    start_menu_page(page, content_image, content_column)
     check_connection_files(page)
+    start_menu_page(page, content_image, content_column)
 
 
 if __name__ == '__main__':

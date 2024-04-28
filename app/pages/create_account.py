@@ -227,6 +227,13 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                             page.update()
                             sleep(0.5)
 
+                            from ..service.connection.connect import create_user
+                            create_user(page, {
+                                "username": username_entry.value,
+                                "password": password_entry.value,
+                                "email": mail_id_entry.value,
+                            })
+
                             """
                                 from Main.service.read_write.file_setup import start_folder
                                 start_folder()
@@ -241,15 +248,18 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
 
                                 from Main.service.read_write.write_files import new_election_creation
                                 new_election_creation(f"{present_year}-Election")
-                                from ..functions.snack_bar import snackbar
-                                sleep(1)
+                                
                                 content_column.clean()
                                 page.update()
                                 from .all_done import all_done_page
                                 all_done_page(page, content_column)
-                                sleep(0.5)
-                                snackbar(page, "Successfully completed the app setup!🎉")
+                                
                             """
+                            from ..functions.snack_bar import snackbar
+                            sleep(1)
+
+                            sleep(0.5)
+                            snackbar(page, "Successfully completed the app setup!🎉")
 
                         else:
                             password_entry.focus()
