@@ -1,0 +1,11 @@
+{
+  "name": "Settings",
+  "version": "6.01",
+  "Theme": "blue",
+  "Theme Mode": "light",
+  "system_type": null,
+  "network_connection": false,
+  "election": null,
+  "maximized": true,
+  "at_close": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Election-Settings",
+  "version": "5.01",
+  "election-name": null,
+  "vote_option": false,
+  "completed": false,
+  "code": null,
+  "final_nomination":false,
+  "lock_data": false,
+  "result": false,
+  "server": false,
+  "created-datetime": null
+}

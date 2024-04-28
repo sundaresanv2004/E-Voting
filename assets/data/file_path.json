@@ -1,0 +1,12 @@
+{
+  "name": "file_path",
+  "version": "5.01",
+  "app_data": "/data/a/app_data",
+  "admin_files": "/data/a/admin_files",
+  "admin_data": "/data/a/admin_files/admin_data",
+  "admin_login_data": "/data/a/admin_files/admin_login_data",
+  "election_files": "/data/e/election_files",
+  "election_data": "/data/e/election_data.csv",
+  "settings": "/data/s/settings.json",
+  "connection": "/server/connection/"
+}
