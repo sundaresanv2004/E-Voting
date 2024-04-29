@@ -1,7 +1,6 @@
 import flet as ft
 
 from .create_account import create_account_page
-from ..service.connection.connect import check_new_file, check_file_exist
 from ..service.scr.check_installation import new_start
 
 cont_image = None
@@ -88,6 +87,7 @@ def on_create_account(e):
 def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: ft.Column):
     global cont_image, cont_column, page1
     cont_image, cont_column, page1 = content_image, content_column, page
+    from ..service.connection.firebase_connect import new_election, connect_server
 
     if new_start is True:
         list_menu_button = [
@@ -96,14 +96,14 @@ def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: 
                 height=50,
                 width=250,
                 on_click=on_create_account,
-                disabled=check_new_file()
+                disabled=new_election
             ),
             ft.ElevatedButton(
                 text="Connect Server",
                 height=50,
                 width=250,
                 tooltip="Disabled",
-                disabled=check_file_exist(),
+                disabled=connect_server,
             ),
         ]
     else:

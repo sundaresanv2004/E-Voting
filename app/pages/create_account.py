@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from time import sleep
 import flet as ft
 
@@ -227,11 +228,17 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                             page.update()
                             sleep(0.5)
 
-                            from ..service.connection.connect import create_user
+                            from ..service.connection.firebase_connect import create_user, app_data
                             create_user(page, {
                                 "username": username_entry.value,
                                 "password": password_entry.value,
                                 "email": mail_id_entry.value,
+                            })
+
+                            app_data({
+                                "institution_name": institution_name,
+                                "election_name": election_name,
+                                "created_datetime": datetime.now(),
                             })
 
                             """

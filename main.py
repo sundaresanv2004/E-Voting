@@ -1,5 +1,6 @@
 import flet as ft
 
+from app.functions.dialogs import loading_dialogs
 from app.functions.theme import set_theme
 from app.functions.window_actions import window_on_resize, window_at_start
 from app.pages.start_menu import start_menu_page
@@ -57,9 +58,12 @@ def main(page: ft.Page):
         )
     )
 
+    load = loading_dialogs(page, "Connecting...")
     page.add(bg_container)
     check_connection_files(page)
     start_menu_page(page, content_image, content_column)
+    load.open = False
+    page.update()
 
 
 if __name__ == '__main__':
