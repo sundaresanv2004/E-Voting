@@ -1,12 +1,14 @@
-# Welcome to E-Voting App!
+# Welcome to E-Voting App! (V-6.01)
 
 Experience the ease and security of our advanced election application, designed to simplify and enhance your participation in the democratic process. We prioritize your security, privacy, and the transparency of every vote cast. Here's a comprehensive guide to ensure a smooth and secure election process:
 
-## Secure and Trustworthy:
+## Firebase Connection
 
+Each Firebase project serves as a dedicated repository for a single election dataset. Begin the process of creating a new election by initiating a new project in Firebase. Then, ensure seamless connectivity to additional databases by navigating to the settings menu.
 
-Rest assured that your vote is treated with the utmost security and privacy. Our application employs cutting-edge encryption protocols and stringent security measures to safeguard your personal information and ensure the integrity of the voting process.
+Don't know how to create firebase project!
 
+Learn to create firebase project under settings menu > How to create firebase project?
 
 ## Conducting an election:
 
@@ -46,5 +48,6 @@ Maintain a clear distinction between elections with the option to create a new o
 
 - In the settings page, find the option to manage or create a new election.
 - Click on "New Election" to initiate the creation of a fresh and independent election.
+- Upload the new firebase project key to connect with fire base.
 - Select the newly created election as the "Current Election" to focus on its actions and data.
 

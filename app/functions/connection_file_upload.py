@@ -48,8 +48,7 @@ def connection_file_error(page: ft.Page):
         ),
         actions=[
             ft.TextButton(
-                text="Troubleshoot",
-                icon=ft.icons.TROUBLESHOOT_ROUNDED,
+                text="Help",
                 on_click=troubleshoot,
             ),
             ft.TextButton(

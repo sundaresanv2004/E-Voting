@@ -1,7 +1,6 @@
 import pandas as pd
 import flet as ft
 
-from .firebase_connect import start_connection
 from ..scr.check_installation import path
 from ..scr.local_files_scr import file_path
 
@@ -12,4 +11,5 @@ def check_connection_files(page: ft.Page):
         from ...functions.connection_file_upload import connection_file_error
         connection_file_error(page)
     else:
+        from .firebase_connect import start_connection
         start_connection()

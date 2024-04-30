@@ -1,3 +1,4 @@
+import json
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 import pandas as pd
@@ -39,7 +40,17 @@ def create_user(page, info_dict: dict):
     except firebase_admin._auth_utils.EmailAlreadyExistsError:
         message_dialogs(page, 'EmailAlreadyExistsError')
 
+    ele_data = pd.read_csv(path + file_path['election_data'])
+    a = ele_data.index.max()
+    if ele_data.loc[a, 'election_name'] == 'untitled':
+        ele_data.at[a, 'election_name'] = info_dict['election_name']
+        ele_data.to_csv(path + file_path['election_data'], index=False)
+
 
 def app_data(info_dict: dict):
     db = firestore.client()
     db.collection('settings').document('AppData').set(info_dict)
+
+    with open(path + file_path['app_data'], 'w') as f:
+        data = json.dumps(info_dict)
+        f.close()

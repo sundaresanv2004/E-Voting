@@ -1,7 +1,7 @@
 {
   "name": "file_path",
-  "version": "5.01",
-  "app_data": "/data/a/app_data",
+  "version": "6.01",
+  "app_data": "/data/a/app_data.json",
   "admin_files": "/data/a/admin_files",
   "admin_data": "/data/a/admin_files/admin_data",
   "admin_login_data": "/data/a/admin_files/admin_login_data",

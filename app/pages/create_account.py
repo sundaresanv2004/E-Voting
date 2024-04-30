@@ -49,7 +49,7 @@ def create_account_page(page: ft.Page, content_image: ft.Container, content_colu
 
         if len(type_name_entry.value) != 0:
             if len(election_name_entry.value) != 0:
-                button_container.content = ft.ProgressRing(color=ft.colors.WHITE)
+                button_container.content = ft.ProgressRing()
                 page.update()
                 type_name_entry.disabled = True
                 election_name_entry.disabled = True
@@ -176,7 +176,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
             username_entry.suffix_icon = None
             username_entry.error_text = None
         else:
-            username_entry.error_text = "Enter the Username"
+            username_entry.error_text = "Enter the username"
             username_entry.suffix_icon = ft.icons.ERROR_OUTLINE_ROUNDED
         username_entry.update()
 
@@ -189,10 +189,10 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                 mail_id_entry.suffix_icon = ft.icons.CHECK_CIRCLE
                 mail_id_entry.error_text = None
             else:
-                mail_id_entry.error_text = "Enter the Valid Mail id"
+                mail_id_entry.error_text = "Enter the valid email"
                 mail_id_entry.suffix_icon = ft.icons.CLOSE_ROUNDED
         else:
-            mail_id_entry.error_text = "Enter the Mail id"
+            mail_id_entry.error_text = "Enter the email"
             mail_id_entry.suffix_icon = ft.icons.ERROR_OUTLINE_ROUNDED
         mail_id_entry.update()
 
@@ -203,7 +203,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
             else:
                 password_entry.error_text = "Password should be least 8 characters long!"
         else:
-            password_entry.error_text = "Enter the Password"
+            password_entry.error_text = "Enter the password"
         password_entry.update()
 
     def on_submit_click(e):
@@ -216,7 +216,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                 if re.fullmatch(mail_check, mail_id_entry.value):
                     if len(password_entry.value) != 0:
                         if len(password_entry.value) >= 8:
-                            button_container.content = ft.ProgressRing(color=ft.colors.WHITE)
+                            button_container.content = ft.ProgressRing()
                             page.update()
                             back_button.disabled = True
                             button_y_admin_details.disabled = True
@@ -233,38 +233,23 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                 "username": username_entry.value,
                                 "password": password_entry.value,
                                 "email": mail_id_entry.value,
-                            })
-
-                            app_data({
-                                "institution_name": institution_name,
                                 "election_name": election_name,
-                                "created_datetime": datetime.now(),
                             })
 
-                            """
-                                from Main.service.read_write.file_setup import start_folder
-                                start_folder()
-                                sleep(0.5)
+                            app_data(
+                                {
+                                    "institution_name": institution_name,
+                                    "election_name": election_name,
+                                    "created_datetime": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                                }
+                            )
 
-                                from Main.service.read_write.file_setup import app_start
-                                app_start(institution_name)
-                                sleep(1)
-
-                                from Main.service.read_write.write_files import admin_data_in
-                                admin_data_in([username_entry.value, mail_id_entry.value, password_entry.value, True])
-
-                                from Main.service.read_write.write_files import new_election_creation
-                                new_election_creation(f"{present_year}-Election")
-                                
-                                content_column.clean()
-                                page.update()
-                                from .all_done import all_done_page
-                                all_done_page(page, content_column)
-                                
-                            """
                             from ..functions.snack_bar import snackbar
                             sleep(1)
-
+                            content_column.clean()
+                            page.update()
+                            from .all_done import all_done_page
+                            all_done_page(page, content_column)
                             sleep(0.5)
                             snackbar(page, "Successfully completed the app setup!🎉")
 
@@ -299,7 +284,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
 
     # Input Fields
     username_entry = ft.TextField(
-        hint_text="Enter the Username",
+        hint_text="Enter your username",
         width=330,
         filled=False,
         prefix_icon=ft.icons.PERSON_ROUNDED,
@@ -313,7 +298,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
     )
 
     mail_id_entry = ft.TextField(
-        hint_text="Enter the Mail id",
+        hint_text="Enter your email",
         width=330,
         filled=False,
         prefix_icon=ft.icons.MAIL_ROUNDED,
@@ -326,7 +311,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
     )
 
     password_entry = ft.TextField(
-        hint_text="Enter the Password",
+        hint_text="Enter your password",
         width=330,
         filled=False,
         prefix_icon=ft.icons.LOCK_ROUNDED,
