@@ -1,9 +1,9 @@
 import flet as ft
 
-from app.service.read_write.settings_file import on_close_change
+from app.service.files.settings_file import on_close_change
 
 
-def close_true(page: ft.Page):
+def close_true(page: ft.Page) -> None:
     def on_no(e):
         from ..service.connection.check_files import check_connection_files
         exit_confirm_dialog.open = False
@@ -22,7 +22,7 @@ def close_true(page: ft.Page):
     )
 
     exit_confirm_dialog = ft.AlertDialog(
-        modal=False,
+        modal=True,
         title=ft.Row(
             [
                 ft.Icon(
@@ -58,9 +58,10 @@ def close_true(page: ft.Page):
                 text="Cancel",
                 on_click=on_no
             ),
-            ft.OutlinedButton(
+            ft.TextButton(
                 text="Exit",
-                on_click=on_yes
+                autofocus=True,
+                on_click=on_yes,
             ),
         ],
         actions_alignment=ft.MainAxisAlignment.END,

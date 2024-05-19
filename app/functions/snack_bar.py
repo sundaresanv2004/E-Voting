@@ -1,9 +1,8 @@
 import flet as ft
 
 
-def snackbar(page: ft.Page, text: str):
+def snackbar(page: ft.Page, text: str) -> None:
 
-    # Functions
     def close(e):
         page.snack_bar = snack_bar
         page.snack_bar.open = False

@@ -13,7 +13,7 @@ if platform.system() == "Windows":
     path = os.getenv('APPDATA') + r'/E-Voting'
 elif platform.system() == 'Darwin':
     os_sys = platform.system()
-    path = os.path.expanduser('~') + r"/E-Voting"
+    path = os.path.expanduser('~') + r"/Library/Application Support/E-Voting"
 
 
 def installation_requirement():
@@ -26,13 +26,17 @@ def installation_requirement():
             os.makedirs(path + r'/backup')
             settings_ser = pd.Series(default_setting_data)
             settings_ser.to_json(path + file_path['settings'], orient='table', index=True)
-            ele_data = pd.DataFrame(columns=['election_name', 'connection_path'])
-            ele_data.to_csv(path + file_path['election_data'], index=False)
+            ele_data_ = pd.DataFrame(columns=['election_name', 'connection_path'])
+            ele_data_.to_csv(path + file_path['election_data'], index=False)
         except FileExistsError:
             pass
 
 
-if not os.path.exists(path + file_path['app_data']):
+try:
+    ele_data = pd.read_csv(path + file_path['election_data'])
+    if ele_data.empty is True:
+        new_start = True
+    else:
+        new_start = False
+except FileNotFoundError:
     new_start = True
-else:
-    new_start = False

@@ -2,7 +2,7 @@ from time import sleep
 import flet as ft
 import shutil
 
-from ..service.scr.local_files_scr import warnings
+from ..service.files.local_files_scr import warnings
 
 
 def message_dialogs(page: ft.Page, message_key: str):

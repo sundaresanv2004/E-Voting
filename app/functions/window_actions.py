@@ -1,13 +1,13 @@
 import flet as ft
 import pandas as pd
 
-from ..functions.window_close import close_true
-from ..service.read_write.settings_file import window_resize_change
-from ..service.scr.check_installation import path
-from ..service.scr.local_files_scr import file_path
+from .window_close import close_true
+from ..service.files.settings_file import window_resize_change
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
 
 
-def window_at_start(page: ft.Page):
+def window_at_start(page: ft.Page) -> None:
     settings_ser = pd.read_json(path + file_path['settings'], orient='table')
 
     # at_close
@@ -22,7 +22,7 @@ def window_at_start(page: ft.Page):
     page.window_maximized = settings_ser.loc['maximized'].values[0]
 
 
-def window_on_resize(page: ft.Page):
+def window_on_resize(page: ft.Page) -> None:
 
     try:
         setting_ser = pd.read_json(path + file_path['settings'], orient='table')
