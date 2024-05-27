@@ -27,7 +27,6 @@ def main(page: ft.Page) -> None:
     layout(page)
 
     check_connection_files(page)
-
     page.go('/')
 
 

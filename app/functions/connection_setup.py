@@ -1,16 +1,36 @@
-from time import sleep
 import flet as ft
-import shutil
+import re
 
-from app.service.files.local_files_scr import firebase_project
+from ..service.files.local_files_scr import firebase_project
+from ..service.files.manage_files import create_connection_json
 
 
 def connection_setup(page: ft.Page):
     def on_ok(e):
         if len(entry_box.value) > 0:
             entry_box.error_text = None
+            match = re.search(r'const firebaseConfig = \{([^}]+)\};', entry_box.value, re.DOTALL)
+
+            if match:
+                config_content = match.group(1).strip()
+                config_dict = {}
+                for line in config_content.split(',\n'):
+                    line = line.strip()
+                    key, value = line.split(':', 1)
+                    key = key.strip().strip('"')
+                    value = value.strip().strip('"')
+                    config_dict[key] = value
+                create_connection_json(config_dict)
+                connection_error.open = False
+                page.update()
+                from ..service.connection.check_files import check_connection_files
+                check_connection_files(page)
+                # page.go("/")
+            else:
+                entry_box.error_text = "invalid config code."
+                entry_box.focus()
         else:
-            entry_box.error_text = "Paste/Enter the Config code."
+            entry_box.error_text = "Paste or Enter the config code."
             entry_box.focus()
         page.update()
 

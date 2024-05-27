@@ -11,4 +11,10 @@ connect_server = True
 
 
 def start_connection():
-    pass
+    setting_ser = pd.read_json(path + file_path['settings'], orient='table')
+
+    with open(setting_ser.loc['election'].values[0], 'r') as file:
+        config_dict = json.load(file)
+        file.close()
+
+    firebase = pyrebase.initialize_app(config_dict)
