@@ -1,2 +1,3 @@
-flet==0.22.*
+flet~=0.22.1
 pandas~=2.2.2
+pyrebase4~=4.8.0

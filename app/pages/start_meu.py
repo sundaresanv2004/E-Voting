@@ -1,7 +1,7 @@
 import flet as ft
 
-from ..service.connection.firebase_connect import new_election, connect_server
-from ..service.files.check_installation import new_start
+from app.service.files.check_installation import new_start
+from app.service.firebase.connect_firebase import new_election, connect_server
 
 
 def start_page(page: ft.Page):
@@ -28,7 +28,7 @@ def start_page(page: ft.Page):
             height=550,
             border_radius=15,
             bgcolor='#44CCCCCC',
-            blur=ft.Blur(30, 15, ft.BlurTileMode.CLAMP),
+            blur=ft.Blur(30, 15, ft.BlurTileMode.MIRROR),
             content=ft.Column(
                 [
                     content_image,
@@ -45,7 +45,7 @@ def start_page(page: ft.Page):
         visible=False
     )
 
-    if new_start is True:
+    if new_start():
         list_menu_button = [
             ft.ElevatedButton(
                 text="New Election",
@@ -86,7 +86,4 @@ def start_page(page: ft.Page):
         )
     ]
 
-    return [
-        bg_container,
-        settings_icon
-    ]
+    page.add(bg_container)

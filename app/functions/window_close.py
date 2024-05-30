@@ -5,7 +5,7 @@ from app.service.files.settings_file import on_close_change
 
 def close_true(page: ft.Page) -> None:
     def on_no(e):
-        from ..service.connection.check_files import check_connection_files
+        from ..service.firebase.check_files import check_connection_files
         exit_confirm_dialog.open = False
         page.update()
         check_connection_files(page)

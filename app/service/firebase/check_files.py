@@ -13,6 +13,6 @@ def check_connection_files(page: ft.Page) -> None:
         connection_setup(page)
     else:
         dig = loading_dialogs(page, "Connecting...")
-        from .firebase_connect import start_connection
-        start_connection()
+        # from .firebase_connect import start_connection
+        # start_connection()
         dig.open = False

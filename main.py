@@ -1,13 +1,13 @@
 import flet as ft
 
-from app.service.files.check_installation import installation_requirement
-from app.functions.window_actions import window_at_start, window_on_resize
-from app.service.connection.check_files import check_connection_files
 from app.functions.theme import set_theme
-from app.pages._layout import layout
+from app.functions.window_actions import window_at_start, window_on_resize
+from app.pages.start_meu import start_page
+from app.service.files.check_installation import installation_requirement
+from app.service.firebase.check_files import check_connection_files
 
 
-def main(page: ft.Page) -> None:
+def main(page: ft.Page):
     # Title
     page.title = "E-Voting"
 
@@ -21,18 +21,15 @@ def main(page: ft.Page) -> None:
 
     # Theme
     set_theme(page)
-    page.update()
 
-    # Layout
-    layout(page)
-
+    start_page(page)
     check_connection_files(page)
-    page.go('/')
 
 
 if __name__ == '__main__':
     installation_requirement()
     ft.app(
         target=main,
-        assets_dir='assets'
+        assets_dir='assets',
     )
+

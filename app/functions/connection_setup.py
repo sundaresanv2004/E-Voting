@@ -2,7 +2,6 @@ import flet as ft
 import re
 
 from ..service.files.local_files_scr import firebase_project
-from ..service.files.manage_files import create_connection_json
 
 
 def connection_setup(page: ft.Page):
@@ -12,20 +11,7 @@ def connection_setup(page: ft.Page):
             match = re.search(r'const firebaseConfig = \{([^}]+)\};', entry_box.value, re.DOTALL)
 
             if match:
-                config_content = match.group(1).strip()
-                config_dict = {}
-                for line in config_content.split(',\n'):
-                    line = line.strip()
-                    key, value = line.split(':', 1)
-                    key = key.strip().strip('"')
-                    value = value.strip().strip('"')
-                    config_dict[key] = value
-                create_connection_json(config_dict)
-                connection_error.open = False
-                page.update()
-                from ..service.connection.check_files import check_connection_files
-                check_connection_files(page)
-                # page.go("/")
+                pass
             else:
                 entry_box.error_text = "invalid config code."
                 entry_box.focus()
@@ -46,6 +32,15 @@ def connection_setup(page: ft.Page):
         max_lines=4,
     )
 
+    upload_file = ft.Row(
+        [
+            ft.TextButton(
+                icon=ft.icons.UPLOAD_FILE_ROUNDED,
+                text="Upload file",
+            )
+        ]
+    )
+
     # AlertDialog data
     connection_error = ft.AlertDialog(
         modal=True,
@@ -61,9 +56,10 @@ def connection_setup(page: ft.Page):
                     width=650
                 ),
                 entry_box,
+                upload_file,
             ],
             spacing=20,
-            height=210,
+            height=260,
         ),
         actions=[
             ft.TextButton(

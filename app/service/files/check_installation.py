@@ -26,19 +26,20 @@ def installation_requirement():
             os.makedirs(path + r'/backup')
             settings_ser = pd.Series(default_setting_data)
             settings_ser.to_json(path + file_path['settings'], orient='table', index=True)
-            ele_data_ = pd.DataFrame(columns=['election_name', 'connection_path', 'authenticated'])
+            ele_data_ = pd.DataFrame(columns=['election_name', 'connection_path', 'key_path', 'authenticated'])
             ele_data_.to_csv(path + file_path['election_data'], index=False)
         except FileExistsError:
             pass
 
 
-try:
-    ele_data = pd.read_csv(path + file_path['election_data'])
-    if ele_data.empty is True:
-        new_start = True
-    else:
-        setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-        auth_status = ele_data[ele_data.connection_path == setting_ser.loc['election'].values[0]]
-        new_start = not auth_status.values[0][2]
-except FileNotFoundError:
-    new_start = True
+def new_start() -> bool:
+    try:
+        ele_data = pd.read_csv(path + file_path['election_data'])
+        if ele_data.empty is True:
+            return True
+        else:
+            setting_ser = pd.read_json(path + file_path['settings'], orient='table')
+            auth_status = ele_data[ele_data.election_name == setting_ser.loc['election'].values[0]]
+            return not auth_status.values[0][2]
+    except FileNotFoundError:
+        return True
