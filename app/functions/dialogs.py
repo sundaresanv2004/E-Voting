@@ -74,3 +74,73 @@ def message_dialogs(page: ft.Page, message_key: str):
     page.dialog = message_alertdialog
     message_alertdialog.open = True
     page.update()
+
+
+def network_error(page: ft.Page, error: Exception):
+    def on_retry(e):
+        from main import main
+        page.clean()
+        main(page)
+
+    alertdialog = ft.AlertDialog(
+        modal=True,
+        title=ft.Text(
+            value="Network Error!",
+            font_family='Verdana',
+            weight=ft.FontWeight.W_500,
+        ),
+        content=ft.Column(
+            [
+                ft.Row(
+                    [
+                        ft.Icon(
+                            name=ft.icons.SIGNAL_WIFI_STATUSBAR_CONNECTED_NO_INTERNET_4_ROUNDED,
+                            size=25,
+                        ),
+                        ft.Text(
+                            value="Unable to connect to the internet. Please check your internet connection.",
+                            font_family='Verdana',
+                        ),
+                    ],
+                ),
+                ft.Column(
+                    [
+                        ft.ExpansionTile(
+                            title=ft.Text(
+                                value="Show detail"
+                            ),
+                            affinity=ft.TileAffinity.TRAILING,
+                            maintain_state=True,
+                            shape=ft.RoundedRectangleBorder(
+                                radius=30,
+                            ),
+                            controls=[
+                                ft.ListTile(
+                                    title=ft.Text(
+                                        f"{error}"
+                                    )
+                                )
+                            ],
+                        )
+                    ],
+                    height=180,
+                    scroll=ft.ScrollMode.ADAPTIVE,
+                )
+            ],
+            height=200,
+            width=600,
+        ),
+        actions=[
+            ft.TextButton(
+                text="Retry",
+                icon=ft.icons.REFRESH_ROUNDED,
+                on_click=on_retry,
+            ),
+        ]
+    )
+
+    page.dialog = alertdialog
+    alertdialog.open = True
+    page.update()
+
+    # return alertdialog

@@ -1,4 +1,7 @@
 import json
+import os
+import sys
+
 import pyrebase
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
@@ -6,7 +9,7 @@ import pandas as pd
 import platform
 import uuid
 
-from app.functions.dialogs import message_dialogs
+from app.functions.dialogs import message_dialogs, network_error
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
 
@@ -16,8 +19,8 @@ election_name = None
 firebase = None
 
 
-def start_connection():
-    global new_election, connect_server, election_name, firebase
+def start_connection(page):
+    global new_election, connect_server, election_name, firebase, data
 
     ele_data = pd.read_csv(path + file_path['election_data'])
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
@@ -38,7 +41,11 @@ def start_connection():
     except ValueError:
         pass
 
-    data = auth.list_users()
+    try:
+        data = auth.list_users()
+    except Exception as e:
+        network_error(page, e)
+        breakpoint()
 
     if len(data.users) == 0:
         new_election = False
@@ -63,6 +70,9 @@ def create_user(page, info_dict: dict):
         )
     except firebase_admin._auth_utils.EmailAlreadyExistsError:
         message_dialogs(page, 'EmailAlreadyExistsError')
+    except Exception as e:
+        network_error(page, e)
+        breakpoint()
 
     ele_data = pd.read_csv(path + file_path['election_data'])
     ele_path_data = ele_data[ele_data.election_name == election_name]

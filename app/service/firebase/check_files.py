@@ -14,5 +14,5 @@ def check_connection_files(page: ft.Page) -> None:
     else:
         dig = loading_dialogs(page, "Connecting...")
         from .connect_firebase import start_connection
-        start_connection()
+        start_connection(page)
         dig.open = False

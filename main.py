@@ -1,5 +1,6 @@
 import flet as ft
 
+from app.functions.dialogs import network_error
 from app.functions.theme import set_theme
 from app.functions.window_actions import window_at_start, window_on_resize
 from app.pages.start_menu import start_menu_page
