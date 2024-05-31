@@ -3,7 +3,7 @@
   "version": "5.01",
   "Forgot Password?": "Contact your domain admin for help.",
   "Read Me!": "We would like you to enter admin details. \nThereby ensuring that no one else can access your account. \n\nAt the same time, the admin is the only one in control of all options and data.\nEntering a solid password is essential. Which ensures a safe and secure login.\nLater you can login using same details.\n\nNote: \"Ensure your password to be confidential\"",
-  "Restart Required": "App need to be restarted.",
+  "Restart Required": "App need to be restarted manually.",
   "Delete this record?": "This record can't be deleted.",
   "Edit this record?": "You can't edit this record.",
   "Election Filed not Selected": "You must select or create an election filed to add data.\n\nTo add or select. navigate to settings>Admin settings \nyou will find the option to select or create election filed.",

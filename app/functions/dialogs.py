@@ -1,5 +1,7 @@
 import flet as ft
 
+from app.service.files.local_files_scr import warnings
+
 
 def loading_dialogs(page: ft.Page, text: str) -> ft.AlertDialog:
     alertdialog = ft.AlertDialog(
@@ -39,3 +41,38 @@ def loading_dialogs(page: ft.Page, text: str) -> ft.AlertDialog:
     page.update()
 
     return alertdialog
+
+
+def message_dialogs(page: ft.Page, message_key: str):
+    def on_ok(e):
+        message_alertdialog.open = False
+        page.update()
+        if message_key == "Restart Required":
+            page.window_destroy()
+
+    # AlertDialog data
+    message_alertdialog = ft.AlertDialog(
+        modal=True,
+        title=ft.Text(
+            value=f"{message_key}",
+            font_family='Verdana',
+        ),
+        content=ft.Text(
+            value=f"{warnings[message_key]}",
+            font_family='Verdana',
+        ),
+        actions=[
+            ft.TextButton(
+                text="Ok",
+                on_click=on_ok,
+            ),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    # Open dialog
+    page.dialog = message_alertdialog
+    message_alertdialog.open = True
+    page.update()
+
+

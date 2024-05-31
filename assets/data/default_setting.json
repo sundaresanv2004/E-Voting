@@ -1,8 +1,9 @@
 {
   "name": "Settings",
   "version": "6.01",
-  "Theme": "indigo",
-  "Theme Mode": "light",
+  "system_id": null,
+  "theme": "indigo",
+  "theme_mode": "light",
   "system_type": null,
   "network_connection": false,
   "election_name": null,

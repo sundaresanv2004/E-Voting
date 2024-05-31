@@ -10,9 +10,9 @@ def check_connection_files(page: ft.Page) -> None:
     ele_data = pd.read_csv(path + file_path['election_data'])
     if ele_data.empty:
         from ...functions.connection_setup import connection_setup
-        connection_setup(page)
+        connection_setup(page, True)
     else:
         dig = loading_dialogs(page, "Connecting...")
-        # from .firebase_connect import start_connection
-        # start_connection()
+        from .connect_firebase import start_connection
+        start_connection()
         dig.open = False

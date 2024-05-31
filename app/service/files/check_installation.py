@@ -39,7 +39,7 @@ def new_start() -> bool:
             return True
         else:
             setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-            auth_status = ele_data[ele_data.election_name == setting_ser.loc['election'].values[0]]
-            return not auth_status.values[0][2]
+            auth_status = ele_data[ele_data.election_name == setting_ser.loc['election_name'].values[0]]
+            return not auth_status.values[0][3]
     except FileNotFoundError:
         return True
