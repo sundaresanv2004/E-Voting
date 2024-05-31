@@ -74,5 +74,3 @@ def message_dialogs(page: ft.Page, message_key: str):
     page.dialog = message_alertdialog
     message_alertdialog.open = True
     page.update()
-
-

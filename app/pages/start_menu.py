@@ -2,6 +2,7 @@ import flet as ft
 
 from app.functions.manage_database import manage_db_dialogs
 from app.pages.create_account import create_account_page
+from app.pages.login import login_page
 from app.service.files.check_installation import new_start
 import app.service.firebase.connect_firebase as ser
 
@@ -22,6 +23,11 @@ def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: 
         page.remove(settings_button)
         animations(170)
         create_account_page(page, content_image, content_column)
+
+    def on_sign_in(e):
+        page.remove(settings_button)
+        animations(170)
+        login_page(page, content_image, content_column)
 
     if new_start():
         list_menu_button = [
@@ -46,7 +52,7 @@ def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: 
                 text="Sign In",
                 height=50,
                 width=250,
-                # on_click=on_sign_in,
+                on_click=on_sign_in,
             ),
             ft.ElevatedButton(
                 text="Vote",

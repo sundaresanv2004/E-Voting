@@ -36,7 +36,7 @@ def start_connection():
         firebase_admin.initialize_app(cred)
         firebase = pyrebase.initialize_app(config_dict)
     except ValueError:
-        print("error")
+        pass
 
     data = auth.list_users()
 
@@ -86,7 +86,6 @@ def system_data(status: bool) -> None:
         'name': platform.node(),
         'os': platform.system(),
         'version': platform.release(),
-        'architecture': platform.architecture(),
         'platform': platform.platform(),
         'processor': platform.processor(),
         'release': platform.release(),
@@ -96,3 +95,9 @@ def system_data(status: bool) -> None:
 
     setting_ser.to_json(path + file_path['settings'], orient='table', index=True)
     db.collection('system_data').document(system_id).set(system_info)
+
+
+def admin_data():
+    data = auth.list_users()
+    for user in data.users:
+        print(user.email)

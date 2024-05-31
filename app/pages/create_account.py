@@ -190,10 +190,10 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                 mail_id_entry.suffix_icon = ft.icons.CHECK_CIRCLE
                 mail_id_entry.error_text = None
             else:
-                mail_id_entry.error_text = "Enter the valid email"
+                mail_id_entry.error_text = "Enter the valid email address"
                 mail_id_entry.suffix_icon = ft.icons.CLOSE_ROUNDED
         else:
-            mail_id_entry.error_text = "Enter the email"
+            mail_id_entry.error_text = "Enter your email address"
             mail_id_entry.suffix_icon = ft.icons.ERROR_OUTLINE_ROUNDED
         mail_id_entry.update()
 
@@ -256,7 +256,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                 from ..functions.snack_bar import snackbar
                                 snackbar(page, "Successfully completed the app setup!🎉")
                             else:
-                                mail_id_entry.error_text = "Enter the valid email"
+                                mail_id_entry.error_text = "Enter the valid email address"
                                 mail_id_entry.suffix_icon = ft.icons.CLOSE_ROUNDED
                         else:
                             password_entry.focus()
@@ -303,7 +303,7 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
     )
 
     mail_id_entry = ft.TextField(
-        hint_text="Enter your email",
+        hint_text="Enter your email address",
         width=330,
         filled=False,
         prefix_icon=ft.icons.MAIL_ROUNDED,
