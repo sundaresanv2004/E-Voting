@@ -1,4 +1,5 @@
 import flet as ft
+from time import sleep
 
 verified: bool = False
 verified_dialog_open: bool = True
@@ -19,10 +20,12 @@ def verification_dialogs(page: ft.Page, email_id, ver_code):
         global verified
         if len(entry.value) != 0:
             if entry.value == ver_code:
-                submit_button.visible = False
+                code_alertdialog.actions.remove(submit_button)
+                code_alertdialog.actions.append(load_ring)
                 cancel_button.disabled = True
-                load_ring.visible = True
+                entry.disabled = True
                 page.update()
+                sleep(0.5)
                 verified = True
                 on_cancel(e)
             else:
@@ -59,7 +62,6 @@ def verification_dialogs(page: ft.Page, email_id, ver_code):
         height=20,
         width=20,
         stroke_width=3,
-        visible=False
     )
 
     code_alertdialog = ft.AlertDialog(
@@ -113,7 +115,6 @@ def verification_dialogs(page: ft.Page, email_id, ver_code):
         actions=[
             cancel_button,
             submit_button,
-            load_ring
         ],
         actions_alignment=ft.MainAxisAlignment.END,
     )

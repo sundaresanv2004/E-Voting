@@ -14,11 +14,14 @@ new_election = True
 connect_server = True
 election_name = None
 firebase = None
+connection_status = False
+page_1 = None
 
 
 def start_connection(page):
-    global new_election, connect_server, election_name, firebase, data
+    global new_election, connect_server, election_name, firebase, connection_status, page_1
 
+    page_1 = page
     ele_data = pd.read_csv(path + file_path['election_data'])
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
     ele_path_data = ele_data[ele_data.election_name == setting_ser.loc['election_name'].values[0]]
@@ -35,6 +38,7 @@ def start_connection(page):
         cred = credentials.Certificate(ele_path_data.values[0][2])
         firebase_admin.initialize_app(cred)
         firebase = pyrebase.initialize_app(config_dict)
+        connection_status = True
     except ValueError:
         pass
 
@@ -51,8 +55,8 @@ def start_connection(page):
 
 
 def delete_firebase_admin_app():
-    global new_election, connect_server
-    new_election, connect_server = True, True
+    global new_election, connect_server, connection_status
+    new_election, connect_server, connection_status = True, True, False
     app = firebase_admin.get_app()
     firebase_admin.delete_app(app)
 
@@ -104,7 +108,23 @@ def system_data(status: bool) -> None:
     db.collection('system_data').document(system_id).set(system_info)
 
 
-def admin_data():
-    data = auth.list_users()
-    for user in data.users:
-        print(user.email)
+def admin_data_email() -> None:
+    try:
+        user = auth.list_users()
+    except Exception as e:
+        network_error(page_1, e)
+        breakpoint()
+    emails = {}
+    for user in user.users:
+        emails[user.email] = user.uid
+    return emails
+
+
+def update_password(uid, new_password) -> None:
+    try:
+        auth.update_user(uid, password=new_password)
+    except firebase_admin._auth_utils.UserNotFoundError:
+        pass
+    except Exception as e:
+        network_error(page_1, e)
+        breakpoint()

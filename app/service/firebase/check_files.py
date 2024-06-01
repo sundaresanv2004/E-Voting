@@ -12,7 +12,9 @@ def check_connection_files(page: ft.Page) -> None:
         from ...functions.connection_setup import connection_setup
         connection_setup(page, True)
     else:
-        dig = loading_dialogs(page, "Connecting...")
-        from .connect_firebase import start_connection
-        start_connection(page)
-        dig.open = False
+        import app.service.firebase.connect_firebase as conn
+
+        if conn.connection_status is False:
+            dig = loading_dialogs(page, "Connecting...")
+            conn.start_connection(page)
+            dig.open = False

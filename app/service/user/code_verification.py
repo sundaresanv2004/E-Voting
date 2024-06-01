@@ -15,6 +15,6 @@ def verify_code_email(page: ft.Page) -> bool:
         if ver.verified_dialog_open is False:
             break
         else:
-            sleep(3)
+            sleep(1)
 
     return ver.verified
