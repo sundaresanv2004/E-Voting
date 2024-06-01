@@ -217,17 +217,17 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                 if re.fullmatch(mail_check, mail_id_entry.value):
                     if len(password_entry.value) != 0:
                         if len(password_entry.value) >= 8:
-                            if verify_code_email(page):
-                                button_container.content = ft.ProgressRing()
-                                page.update()
-                                back_button.disabled = True
-                                button_y_admin_details.disabled = True
-                                username_entry.disabled = True
-                                password_entry.disabled = True
-                                mail_id_entry.disabled = True
-                                button_container.disabled = True
-                                button_container.opacity = 0.5
-                                page.update()
+                            button_container.content = ft.ProgressRing()
+                            page.update()
+                            back_button.disabled = True
+                            button_y_admin_details.disabled = True
+                            username_entry.disabled = True
+                            password_entry.disabled = True
+                            mail_id_entry.disabled = True
+                            button_container.disabled = True
+                            button_container.opacity = 0.5
+                            page.update()
+                            if verify_code_email(page, mail_id_entry.value, "Your One-Time Verification Code"):
                                 sleep(0.5)
 
                                 from ..service.firebase.connect_firebase import create_user, app_data, system_data
@@ -257,8 +257,19 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                 from ..functions.snack_bar import snackbar
                                 snackbar(page, "Successfully completed the app setup!🎉")
                             else:
+                                button_container.content = None
+                                button_container.text = "Sign Up"
+                                page.update()
+                                back_button.disabled = False
+                                button_y_admin_details.disabled = False
+                                username_entry.disabled = False
+                                password_entry.disabled = False
+                                mail_id_entry.disabled = False
+                                button_container.disabled = False
+                                button_container.opacity = 1
                                 mail_id_entry.error_text = "Enter the valid email address"
                                 mail_id_entry.suffix_icon = ft.icons.CLOSE_ROUNDED
+                                page.update()
                         else:
                             password_entry.focus()
                             password_entry.update()

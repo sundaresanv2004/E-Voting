@@ -87,13 +87,10 @@ def app_data(info_dict: dict) -> None:
 
 
 def system_data(status: bool) -> None:
-    db = firestore.client()
-    system_id = str(uuid.uuid4())
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-    setting_ser.loc['system_id'] = system_id
-
+    db = firestore.client()
+    system_id = None
     system_info = {
-        'system_id': system_id,
         'name': platform.node(),
         'os': platform.system(),
         'version': platform.release(),
@@ -104,7 +101,14 @@ def system_data(status: bool) -> None:
         "auth_status": status
     }
 
-    setting_ser.to_json(path + file_path['settings'], orient='table', index=True)
+    if setting_ser.loc['system_id'].values[0] is None:
+        system_id = str(uuid.uuid4())
+        setting_ser.loc['system_id'] = system_id
+        setting_ser.to_json(path + file_path['settings'], orient='table', index=True)
+    else:
+        system_id = setting_ser.loc['system_id'].values[0]
+
+    system_info['system_id'] = system_id
     db.collection('system_data').document(system_id).set(system_info)
 
 

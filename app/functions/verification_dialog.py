@@ -42,10 +42,12 @@ def verification_dialogs(page: ft.Page, email_id, ver_code):
         filled=False,
         border=ft.InputBorder.OUTLINE,
         border_radius=10,
+        autofocus=True,
         border_color=ft.colors.BLACK,
         keyboard_type=ft.KeyboardType.NUMBER,
         text_style=ft.TextStyle(font_family='Verdana'),
         error_style=ft.TextStyle(font_family='Verdana'),
+        on_submit=on_ok,
     )
 
     cancel_button = ft.TextButton(

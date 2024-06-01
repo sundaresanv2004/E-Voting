@@ -12,7 +12,7 @@ def read_file(path_file: str) -> dict:
     return file_data
 
 
-# enc_data = read_file(r"/data/enc_data.json")
+enc_data = read_file(r"/data/enc_data.json")
 file_path = read_file(r"/data/file_path.json")
 default_setting_data = read_file(r"/data/default_setting.json")
 warnings = read_file(r"/messages/warning.json")

@@ -36,8 +36,7 @@ def forgot_password_dialog(page: ft.Page):
                     user_id = emails[mail_entry.value]
                     mail_entry.error_text = None
                     mail_entry.update()
-                    on_ok(e)
-                    if verify_code_email(page) is True:
+                    if verify_code_email(page, mail_entry.value, "Your Password Reset Verification Code") is True:
                         update_password_dialog(page, user_id)
                 else:
                     mail_entry.error_text = "Email address not found!"
