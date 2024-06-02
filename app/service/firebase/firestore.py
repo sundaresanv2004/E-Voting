@@ -59,3 +59,28 @@ def system_data(status: bool) -> None:
 
     system_info['system_id'] = system_id
     db.collection('system_data').document(system_id).set(system_info)
+
+
+def read_home_data() -> dict:
+    db = firestore.client()
+    collections = db.collection('settings').stream()
+    data_dict = {}
+    for collection in collections:
+        data_dict[collection.id] = collection.to_dict()
+
+    return data_dict
+
+
+def read_category_data() -> dict:
+    db = firestore.client()
+    collections = db.collection('general').document('category_data')
+    return collections.get().to_dict()
+
+
+def add_category_data(category) -> None:
+    db = firestore.client()
+    category_dict = {
+        str(uuid.uuid4()): category
+    }
+    db.collection('general').document('category_data').update(category_dict)
+

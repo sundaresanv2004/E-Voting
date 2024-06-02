@@ -1,22 +1,23 @@
 from time import sleep
-
 import flet as ft
 import pandas as pd
 
 import app.service.user.login_auth as cc
-
+from app.pages.candidate_add import candidate_add_page
 
 old_data = None
 
 
 def menubar_page(page: ft.Page) -> None:
+    def add_candidate_page_fun(e):
+        candidate_add_page(page)
 
     main_column = ft.Column(expand=True)
 
     add_candidate_button = ft.FloatingActionButton(
         icon=ft.icons.PERSON_ADD_ALT_1_ROUNDED,
         tooltip="Add new Candidate",
-        # on_click=add_candidate_page_fun,
+        on_click=add_candidate_page_fun,
     )
 
     add_staff_button = ft.FloatingActionButton(
@@ -39,11 +40,8 @@ def menubar_page(page: ft.Page) -> None:
                 page.remove(add_candidate_button)
                 candidate.icon = None
             elif old_data == 2:
-                page.remove(add_staff_button)
-                staff.icon = None
-            elif old_data == 3:
                 election.icon = None
-            elif old_data == 4:
+            elif old_data == 3:
                 settings.icon = None
         old_data = e
         page.update()
@@ -55,32 +53,26 @@ def menubar_page(page: ft.Page) -> None:
             home_page(page, main_column)
         elif e == 1:
             candidate.icon = ft.icons.SUPERVISED_USER_CIRCLE
-            # from .candidate_home import candidate_home_page
-            # candidate_home_page(page, main_column)
+            from .candidate_home import candidate_home_page
+            candidate_home_page(page, main_column)
             page.add(add_candidate_button)
         elif e == 2:
-            staff.icon = ft.icons.ADMIN_PANEL_SETTINGS
-            # from .staff_home import staff_home_page
-            # staff_home_page(page, main_column)
-            page.add(add_staff_button)
-        elif e == 3:
             election.icon = ft.icons.HOW_TO_VOTE
             # from .election_settings import election_settings_page
             # election_settings_page(page, main_column)
-        elif e == 4:
+        elif e == 3:
             settings.icon = ft.icons.SETTINGS
             # from .settings import settings_page
             # settings_page(page, main_column)
-        elif e == 5:
-            from main import main
-            from ..functions.dialogs import loading_dialogs
-            dig = loading_dialogs(page, "Logging out...")
-            dig.open = False
-            sleep(2)
+        elif e == 4:
+            # dia = loading_dialogs1(page, "Logging out...")
             old_data = None
+            # dia.open = False
+            page.update()
             page.clean()
             page.splash = None
             page.update()
+            from main import main
             main(page)
         page.update()
 
@@ -96,32 +88,24 @@ def menubar_page(page: ft.Page) -> None:
         on_click=lambda e: on_option_click(e.control.data)
     )
 
-    staff = ft.TextButton(
-        text="Staff",
-        data=2,
-        on_click=lambda e: on_option_click(e.control.data)
-    )
-
     election = ft.TextButton(
         text="Election",
-        data=3,
+        data=2,
         on_click=lambda e: on_option_click(e.control.data)
     )
 
     settings = ft.TextButton(
         text="Settings",
-        data=4,
+        data=3,
         on_click=lambda e: on_option_click(e.control.data)
     )
 
     log_out = ft.TextButton(
         icon=ft.icons.LOGOUT_OUTLINED,
         text="Logout",
-        data=5,
+        data=4,
         on_click=lambda e: on_option_click(e.control.data)
     )
-
-    print(cc.auth_data)
 
     appbar = ft.Container(
         border_radius=9,
@@ -148,7 +132,7 @@ def menubar_page(page: ft.Page) -> None:
                                 ]
                             ),
                             margin=5,
-                            padding=ft.padding.only(10, 0, 10, 0)
+                            padding=ft.padding.only(10, 0, 0, 0)
                         )
                     ],
                     expand=True,
@@ -159,13 +143,15 @@ def menubar_page(page: ft.Page) -> None:
                     [
                         home,
                         candidate,
-                        staff,
                         election,
                         settings,
                     ]
                 ),
                 ft.VerticalDivider(color=ft.colors.PRIMARY, thickness=2),
-                log_out,
+                ft.Container(
+                    log_out,
+                    padding=ft.padding.only(0, 0, 10, 0)
+                ),
             ],
             alignment=ft.MainAxisAlignment.END,
             height=50
@@ -189,7 +175,7 @@ def menubar_page(page: ft.Page) -> None:
 
     page.add(container)
     page.update()
-    on_option_click(0)
+    on_option_click(1)
 
 
 def update():

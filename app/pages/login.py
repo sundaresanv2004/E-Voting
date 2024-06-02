@@ -57,6 +57,8 @@ def login_page(page: ft.Page, content_image: ft.Container, content_column: ft.Co
                         from .menubar import menubar_page
                         page.clean()
                         menubar_page(page)
+                        from ..functions.snack_bar import snackbar
+                        snackbar(page, "Successfully logged in.")
                     else:
                         button_container.content = ft.Text("Sign In")
                         content_column.disabled = False

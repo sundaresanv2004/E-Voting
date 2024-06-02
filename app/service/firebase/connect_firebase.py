@@ -13,13 +13,11 @@ connect_server = True
 election_name = None
 firebase = None
 connection_status = False
-page_1 = None
 
 
 def start_connection(page):
     global new_election, connect_server, election_name, firebase, connection_status, page_1
 
-    page_1 = page
     ele_data = pd.read_csv(path + file_path['election_data'])
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
     ele_path_data = ele_data[ele_data.election_name == setting_ser.loc['election_name'].values[0]]

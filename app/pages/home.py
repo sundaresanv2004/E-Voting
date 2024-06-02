@@ -2,9 +2,14 @@ import flet as ft
 import pandas as pd
 
 from ..functions.date_time import current_time
+import app.service.user.login_auth as cc
+from ..service.firebase.firestore import read_home_data
+from ..service.firebase.realtime_db import read_candidate
 
 
 def home_page(page: ft.Page, main_column: ft.Column):
+    home_data = read_home_data()
+    candidate_data = read_candidate()
 
     student_container = ft.Container(
         width=300,
@@ -20,7 +25,7 @@ def home_page(page: ft.Page, main_column: ft.Column):
                 color=ft.colors.BLACK
             ),
             title=ft.Text(
-                value= "34",  # f"{len(candidate_data_df)}",
+                value=f"{'0' if candidate_data is None else 'a'}",
                 font_family='Verdana',
                 weight=ft.FontWeight.W_400
             ),
@@ -34,7 +39,6 @@ def home_page(page: ft.Page, main_column: ft.Column):
         )
     )
 
-    # staff_df = pd.read_json(path + file_path['admin_data'], orient='table')
     staff_container = ft.Container(
         width=300,
         height=150,
@@ -49,12 +53,12 @@ def home_page(page: ft.Page, main_column: ft.Column):
                 color=ft.colors.BLACK
             ),
             title=ft.Text(
-                value="34", # f"{len(staff_df)}",
+                value=f"{'0' if home_data['election_settings']['final_nomination'] is False else '123123'}",
                 font_family='Verdana',
                 weight=ft.FontWeight.W_400
             ),
             subtitle=ft.Text(
-                value="No.of Staff",
+                value="No.of Votes",
                 color=ft.colors.BLACK,
                 weight=ft.FontWeight.W_300,
                 font_family='Verdana'
@@ -62,9 +66,6 @@ def home_page(page: ft.Page, main_column: ft.Column):
             width=300,
         )
     )
-
-    # app_data_df = pd.read_json(path + file_path['app_data'], orient='table')
-    # setting_df = pd.read_json(path + file_path['settings'], orient='table')
 
     main_column.controls = [
         ft.Column(
@@ -74,7 +75,7 @@ def home_page(page: ft.Page, main_column: ft.Column):
                     margin=ft.margin.only(left=5, right=5),
                     alignment=ft.alignment.center,
                     content=ft.Text(
-                        value="Vels", # app_data_df[app_data_df.topic == 'institution_name'].values[0][1],
+                        value=home_data['appdata']['institution_name'],
                         size=40,
                         font_family='Verdana',
                         color='#172554',
@@ -86,13 +87,13 @@ def home_page(page: ft.Page, main_column: ft.Column):
                     ft.Column(
                         [
                             ft.Text(
-                                value=f"{current_time}, Sundar",  # {cc.teme_data[1].capitalize()}",
+                                value=f"{current_time}, {cc.auth_data['displayName'].capitalize()}",
                                 size=30,
                                 font_family='Verdana',
                                 italic=True,
                             ),
                             ft.Text(
-                                value=f"Selected Name:  2024-25", # {setting_df.loc['Election'].values[0]}",
+                                value=f"Election Name: {home_data['appdata']['election_name']}",
                                 size=25,
                                 font_family='Verdana',
                                 italic=False,
