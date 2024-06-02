@@ -2,7 +2,7 @@ import flet as ft
 import re
 from time import sleep
 
-from app.service.firebase.connect_firebase import admin_data_email, update_password
+from app.service.firebase.auth import admin_data_email, update_password
 from app.service.user.code_verification import verify_code_email
 
 emails = None
@@ -30,7 +30,7 @@ def forgot_password_dialog(page: ft.Page):
                 page.update()
                 sleep(0.5)
                 if emails is None:
-                    emails = admin_data_email()
+                    emails = admin_data_email(page)
 
                 if mail_entry.value in emails.keys():
                     user_id = emails[mail_entry.value]
@@ -125,7 +125,7 @@ def update_password_dialog(page: ft.Page, user_id):
                         forgot_password_alertdialog.actions.append(load_ring)
                         close_button.disabled = True
                         page.update()
-                        update_password(user_id, password_entry.value)
+                        update_password(page, user_id, password_entry.value)
                         on_ok(e)
                     else:
                         conform_password.error_text = "Password didn't match!"

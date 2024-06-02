@@ -1,12 +1,10 @@
 import json
 import pyrebase
 import firebase_admin
-from firebase_admin import credentials, auth, firestore
+from firebase_admin import credentials, auth
 import pandas as pd
-import platform
-import uuid
 
-from app.functions.dialogs import message_dialogs, network_error
+from app.functions.dialogs import network_error
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
 
@@ -59,76 +57,3 @@ def delete_firebase_admin_app():
     new_election, connect_server, connection_status = True, True, False
     app = firebase_admin.get_app()
     firebase_admin.delete_app(app)
-
-
-def create_user(page, info_dict: dict):
-    try:
-        auth.create_user(
-            email=info_dict['email'],
-            password=info_dict['password'],
-            display_name=info_dict['username'],
-            email_verified=True,
-        )
-    except firebase_admin._auth_utils.EmailAlreadyExistsError:
-        message_dialogs(page, 'EmailAlreadyExistsError')
-    except Exception as e:
-        network_error(page, e)
-        breakpoint()
-
-    ele_data = pd.read_csv(path + file_path['election_data'])
-    ele_path_data = ele_data[ele_data.election_name == election_name]
-    ele_data.at[ele_path_data.index.values[0], 'authenticated'] = True
-    ele_data.to_csv(path + file_path['election_data'], index=False)
-
-
-def app_data(info_dict: dict) -> None:
-    db = firestore.client()
-    db.collection('system_data').document('AppData').set(info_dict)
-
-
-def system_data(status: bool) -> None:
-    setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-    db = firestore.client()
-    system_id = None
-    system_info = {
-        'name': platform.node(),
-        'os': platform.system(),
-        'version': platform.release(),
-        'platform': platform.platform(),
-        'processor': platform.processor(),
-        'release': platform.release(),
-        'machine': platform.machine(),
-        "auth_status": status
-    }
-
-    if setting_ser.loc['system_id'].values[0] is None:
-        system_id = str(uuid.uuid4())
-        setting_ser.loc['system_id'] = system_id
-        setting_ser.to_json(path + file_path['settings'], orient='table', index=True)
-    else:
-        system_id = setting_ser.loc['system_id'].values[0]
-
-    system_info['system_id'] = system_id
-    db.collection('system_data').document(system_id).set(system_info)
-
-
-def admin_data_email() -> None:
-    try:
-        user = auth.list_users()
-    except Exception as e:
-        network_error(page_1, e)
-        breakpoint()
-    emails = {}
-    for user in user.users:
-        emails[user.email] = user.uid
-    return emails
-
-
-def update_password(uid, new_password) -> None:
-    try:
-        auth.update_user(uid, password=new_password)
-    except firebase_admin._auth_utils.UserNotFoundError:
-        pass
-    except Exception as e:
-        network_error(page_1, e)
-        breakpoint()

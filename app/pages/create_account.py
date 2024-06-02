@@ -230,7 +230,8 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                             if verify_code_email(page, mail_id_entry.value, "Your One-Time Verification Code"):
                                 sleep(0.5)
 
-                                from ..service.firebase.connect_firebase import create_user, app_data, system_data
+                                from ..service.firebase.firestore import app_data, system_data
+                                from ..service.firebase.auth import create_user
                                 create_user(page, {
                                     "username": username_entry.value,
                                     "password": password_entry.value,

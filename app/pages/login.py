@@ -50,17 +50,13 @@ def login_page(page: ft.Page, content_image: ft.Container, content_column: ft.Co
                     content_column.disabled = True
                     button_container.opacity = 0.5
                     page.update()
-                    import app.service.user.login_enc as cc
-                    val = cc.login_checker(mail_id_entry.value, password_entry.value)
+                    from ..service.user.login_auth import check_login
+                    val = check_login(mail_id_entry.value, password_entry.value)
                     sleep(1)
                     if val is True:
-                        pass
-                        # from .menubar import menubar_page
-                        # page.clean()
-                        # if cc.teme_data[2] == True:
-                        # menubar_page(page, True)
-                        # else:
-                        # menubar_page(page, False)
+                        from .menubar import menubar_page
+                        page.clean()
+                        menubar_page(page)
                     else:
                         button_container.content = ft.Text("Sign In")
                         content_column.disabled = False
