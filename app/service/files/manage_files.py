@@ -27,3 +27,23 @@ def create_appdata_json() -> None:
 
     df = pd.DataFrame(read_home_data(), index=[0])
     df.to_json(path + file_path['app_data'], orient='table', index=False)
+
+
+def create_category() -> None:
+    from ..firebase.firestore import read_category_data
+    dict_data = read_category_data()
+    if len(dict_data) == 0:
+        df = pd.DataFrame(columns=['EMPTY TABLE'])
+    else:
+        df = pd.DataFrame(list(dict_data.values()), index=list(dict_data.keys()))
+    df.to_csv(path + file_path['category_data'], index=False)
+
+
+def create_candidate() -> None:
+    from ..firebase.realtime_db import read_candidate
+    dict_data = read_candidate()
+    if dict_data is None:
+        df = pd.DataFrame(columns=['EMPTY TABLE'])
+    else:
+        df = pd.DataFrame(dict_data)
+    df.to_json(path + file_path['candidate_data'], index=False, orient='table')

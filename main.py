@@ -59,11 +59,11 @@ def main(page: ft.Page):
         )
     )
 
-    page.add(bg_container)
+    # page.add(bg_container)
     check_connection_files(page)
-    # check_login('sundaresanv16@gmail.com', 'admin123')
-    # menubar_page(page)
-    start_menu_page(page, content_image, content_column)
+    check_login('admin@gmail.com', 'admin1234')
+    menubar_page(page)
+    # start_menu_page(page, content_image, content_column)
 
 
 if __name__ == '__main__':

@@ -2,11 +2,12 @@ import flet as ft
 import pandas as pd
 from time import sleep
 
+from app.service.files.check_installation import path
+from app.service.files.local_files_scr import file_path
 from app.service.firebase.firestore import read_category_data, add_category_data
 
 
 def category_add_page(page: ft.Page, page_view):
-    # Functions
     def on_close(e):
         add_category_alertdialog.open = False
         page.update()
@@ -15,11 +16,11 @@ def category_add_page(page: ft.Page, page_view):
             from .candidate_add import candidate_add_page
             candidate_add_page(page)
 
-    category_df = read_category_data()
-    if category_df is None:
+    category_df = pd.read_csv(path + file_path['category_data'])
+    if category_df.empty is True:
         category_list = []
     else:
-        category_list = category_df.values()
+        category_list = list(category_df['category_name'].unique())
 
     def add_new_category(e):
         if len(category_entry.value) != 0:

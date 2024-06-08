@@ -2,7 +2,8 @@ import flet as ft
 import pandas as pd
 
 from ..functions.dialogs import message_dialogs
-from ..service.firebase.realtime_db import read_candidate
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
 
 column_1 = ft.Column()
 main_column1 = None
@@ -28,8 +29,7 @@ def candidate_home_page(page: ft.Page, main_column: ft.Column):
     main_column1 = main_column
 
     def search(e):
-        pass
-        # search_display_candidate(page)
+        search_display_candidate(page)
 
     search_entry.on_change = search
     search_entry.value = None
@@ -51,14 +51,42 @@ def candidate_home_page(page: ft.Page, main_column: ft.Column):
     display_candidate(page)
 
 
+def search_display_candidate(page: ft.Page):
+    # file
+    candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    name_enc = candidate_data_df['candidate_name'].to_list()
+    cat_enc = list(candidate_data_df['category'].unique())
+
+    row_can_data_list: list = []
+    data_in: list = []
+    if len(search_entry.value) != 0:
+        for i in name_enc:
+            if search_entry.value.lower() in i.lower():
+                if name_enc.index(i) not in data_in:
+                    row_can_data_list.append(ViewStaffRecord(page, main_column1, name_enc.index(i)))
+                    data_in.append(name_enc.index(i))
+
+        for j in cat_enc:
+            if search_entry.value.lower() in j.lower():
+                for k in list(candidate_data_df[candidate_data_df.category == j].index.values):
+                    if k not in data_in:
+                        row_can_data_list.append(ViewStaffRecord(page, main_column1, k))
+                        data_in.append(k)
+
+        column_1.controls = row_can_data_list
+        page.update()
+    else:
+        display_candidate(page)
+
+
 def display_candidate(page):
     global column_1
     # file
-    candidate_data = read_candidate()
+    candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
 
     row_can_data_list = []
 
-    if candidate_data is None:
+    if candidate_data_df.empty is True:
         row_can_data_list.append(
             ft.Row(
                 [
@@ -72,14 +100,86 @@ def display_candidate(page):
         )
         column_1.alignment = ft.MainAxisAlignment.CENTER
     else:
-        pass
-        """for i in range(len(candidate_data.index)):
+        for i in range(len(candidate_data_df.index)):
             row_can_data_list.append(ViewStaffRecord(page, main_column1, i))
         column_1.expand = True
         search_entry.disabled = False
         column_1.scroll = ft.ScrollMode.ADAPTIVE
-"""
+
     column_1.controls = row_can_data_list
     page.update()
 
 
+class ViewStaffRecord(ft.UserControl):
+
+    def __init__(self, page, column, index_val):
+        super().__init__()
+        self.page = page
+        self.index_val = index_val
+        self.column = column
+        self.candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+
+    def edit(self, e):
+        pass
+
+    def profile(self, e):
+        pass
+
+    def delete(self, e):
+        pass
+
+    def build(self):
+        if not self.candidate_data_df.loc[self.index_val].values[5]:
+            self_icon = ft.CircleAvatar(
+                content=ft.Icon(
+                    name=ft.icons.ACCOUNT_CIRCLE,
+                ),
+            )
+        else:
+            self_icon = ft.Container(
+                width=50,
+                height=50,
+                alignment=ft.alignment.center,
+                border_radius=50,
+                # image_src=self.candidate_image_destination + rf'/{self.candidate_data_df.loc[self.index_val].values[5]}',
+                image_fit=ft.ImageFit.COVER
+            )
+
+        single_box_row = ft.Card(
+            ft.Container(
+                ft.ListTile(
+                    leading=self_icon,
+                    title=ft.Text(
+                        value=f"{self.candidate_data_df.loc[self.index_val].values[1]}",
+                        font_family='Verdana',
+                    ),
+                    subtitle=ft.Text(
+                        value=f"{self.candidate_data_df.loc[self.index_val].values[2]}",
+                        font_family='Verdana',
+                    ),
+                    trailing=ft.PopupMenuButton(
+                        icon=ft.icons.MORE_VERT_ROUNDED,
+                        items=[
+                            ft.PopupMenuItem(
+                                text="Edit",
+                                icon=ft.icons.EDIT_ROUNDED,
+                                on_click=self.edit
+                            ),
+                            ft.PopupMenuItem(
+                                text="Delete",
+                                icon=ft.icons.DELETE_ROUNDED,
+                                on_click=self.delete
+                            ),
+                        ],
+                    ),
+                    on_click=self.profile,
+                ),
+                padding=ft.padding.symmetric(vertical=3.5),
+                blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
+                border_radius=10,
+            ),
+            elevation=0,
+            color=ft.colors.with_opacity(0.4, '#44CCCCCC')
+        )
+
+        return single_box_row

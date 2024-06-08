@@ -1,6 +1,6 @@
 import flet as ft
 
-from app.service.files.local_files_scr import warnings
+from app.service.files.local_files_scr import warnings, error_data
 
 
 def loading_dialogs(page: ft.Page, text: str) -> ft.AlertDialog:
@@ -144,3 +144,34 @@ def network_error(page: ft.Page, error: Exception):
     page.update()
 
     # return alertdialog
+
+
+def error_dialogs(page: ft.Page, error_key: str):
+
+    def on_ok(e):
+        alertdialog.open = False
+        page.update()
+
+    alertdialog = ft.AlertDialog(
+        modal=True,
+        title=ft.Text(
+            value=f"Error {error_key}!",
+            font_family='Verdana',
+        ),
+        content=ft.Text(
+            value=f"{error_data[error_key]}",
+            font_family='Verdana',
+        ),
+        actions=[
+            ft.TextButton(
+                text="Ok",
+                on_click=on_ok,
+            ),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    page.dialog = alertdialog
+    alertdialog.open = True
+    page.update()
+

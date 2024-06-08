@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 
 import firebase_admin
+import google
 import pandas as pd
 from firebase_admin import firestore
 
@@ -68,13 +69,26 @@ def read_home_data() -> dict:
 
 def read_category_data() -> dict:
     db = firestore.client()
-    collections = db.collection('general').document('category_data')
-    return collections.get().to_dict()
+    collections = db.collection('category')
+    dict1 = {}
+    for doc in collections.stream():
+        dict1[doc.id] = doc.to_dict()
+    return dict1
 
 
 def add_category_data(category) -> None:
     db = firestore.client()
     category_dict = {
-        str(uuid.uuid4()): category
+        'id': str(uuid.uuid4()),
+        'category_name': category,
+        'order': None,
+        'created_datetime': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
-    db.collection('general').document('category_data').update(category_dict)
+    db.collection('category').document(category).set(category_dict)
+
+    category_df = pd.read_csv(path + file_path['category_data'])
+    if category_df.empty is False:
+        category_df.loc[category] = category_dict
+    else:
+        category_df = pd.DataFrame(category_dict, index=[category_df])
+    category_df.to_csv(path + file_path['category_data'], index=False)

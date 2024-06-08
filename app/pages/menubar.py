@@ -4,6 +4,7 @@ import pandas as pd
 
 import app.service.user.login_auth as cc
 from app.pages.candidate_add import candidate_add_page
+from app.service.files.manage_files import create_category, create_candidate
 
 old_data = None
 
@@ -48,6 +49,8 @@ def menubar_page(page: ft.Page) -> None:
         elif e == 1:
             candidate.icon = ft.icons.SUPERVISED_USER_CIRCLE
             from .candidate_home import candidate_home_page
+            create_category()
+            create_candidate()
             candidate_home_page(page, main_column)
             page.add(add_candidate_button)
         elif e == 2:

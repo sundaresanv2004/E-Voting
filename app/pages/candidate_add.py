@@ -1,16 +1,13 @@
-import os
-import glob
-import shutil
-import random
-import string
 from time import sleep
 import flet as ft
 import pandas as pd
 
-from app.service.firebase.firestore import read_category_data
 from .category import category_add_page
+import app.service.user.login_auth as cc
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
 
-list_cand_data = ['', '', '']
+list_cand_data = ['', '', None, '']
 save_button = ft.TextButton(
     text='Save',
     disabled=True,
@@ -24,17 +21,14 @@ def candidate_add_page(page: ft.Page):
     def add_cat(e):
         alertdialog_candidate_add.open = False
         page.update()
+        sleep(0.2)
         category_add_page(page, 'candidate')
 
     def on_close(e):
         global list_cand_data
         alertdialog_candidate_add.open = False
         page.update()
-        if list_cand_data[1] is not False:
-            if len(list_cand_data[1]) != 0:
-                pass
-
-        list_cand_data = ['', '', '', '', '']
+        list_cand_data = ['', '', None, '']
 
     alertdialog_candidate_add = ft.AlertDialog(
         modal=True,
@@ -96,7 +90,7 @@ def build(page: ft.Page):
             if category_dropdown.value is not None:
                 if category_dropdown.value != "No Category Records":
                     list_cand_data[1] = category_dropdown.value
-                    if list_cand_data[2] is not False:
+                    if list_cand_data[2] is not None:
                         save_button.disabled = False
                     else:
                         save_button.disabled = True
@@ -114,7 +108,7 @@ def build(page: ft.Page):
         page.splash = ft.ProgressBar()
         page.update()
         # from ..service.files.write_files import add_candidate
-        # from ..functions.snack_bar import snack_bar1
+        from ..functions.snack_bar import snackbar
         sleep(0.2)
         if list_cand_data[1] is not False:
             if len(list_cand_data[1]) == 0:
@@ -123,26 +117,25 @@ def build(page: ft.Page):
                 image_data = list_cand_data[1]
         else:
             image_data = False
-        #add_candidate([name_entry.value, category_dropdown.value, True, qualification_dropdown.value, image_data,
-        #    cc.teme_data[1]])
+        # add_candidate([name_entry.value, category_dropdown.value, True, qualification_dropdown.value, image_data,
+        #                cc.teme_data[1]])
         page.splash = None
         page.update()
         from .candidate_home import display_candidate
         display_candidate(page)
-        # snack_bar1(page, "Successfully Added")
-        list_cand_data = ['', '', '', '', '']
+        snackbar(page, "Successfully Added")
+        list_cand_data = ['', '', None, '']
 
     save_button.on_click = save
 
-    # category_df = pd.read_csv(ee.current_election_path + rf'/{file_data["category_data"]}')
-    # candidate_image_destination = ee.current_election_path + r'/images'
+    category_df = pd.read_csv(path + file_path['category_data'])
 
     # Input Field
     name_entry = ft.TextField(
         hint_text="Enter the Candidate name",
         width=350,
         border=ft.InputBorder.OUTLINE,
-        border_radius=10,
+        border_radius=9,
         text_style=ft.TextStyle(font_family='Verdana'),
         error_style=ft.TextStyle(font_family='Verdana'),
         autofocus=True,
@@ -155,9 +148,12 @@ def build(page: ft.Page):
         hint_text="Choose Candidate Category",
         width=350,
         border=ft.InputBorder.OUTLINE,
-        border_radius=10,
+        border_radius=9,
         text_style=ft.TextStyle(font_family='Verdana'),
         color=ft.colors.BLACK,
+        options=[
+            ft.dropdown.Option("Select Candidate Qualification"),
+        ],
         prefix_icon=ft.icons.CATEGORY_ROUNDED,
         on_change=disable_button,
     )
@@ -172,39 +168,50 @@ def build(page: ft.Page):
         image_fit=ft.ImageFit.COVER,
     )
 
-    category_df = read_category_data()
-    print(category_df)
-
-    temp_list: list = []
-    if category_df is not None:
-        for i in list(category_df.values()):
-            temp_list.append(ft.dropdown.Option(i))
+    temp_list1: list = []
+    if not category_df.empty:
+        for i in list(category_df['category_name'].unique()):
+            temp_list1.append(ft.dropdown.Option(i))
     else:
-        temp_list.append(ft.dropdown.Option("No Category Records"))
+        temp_list1.append(ft.dropdown.Option("No Category Records"))
 
-    category_dropdown.options = temp_list
+    category_dropdown.options = temp_list1
+
+    if len(list_cand_data[0]) != 0:
+        name_entry.value = list_cand_data[0]
+
+    if len(list_cand_data[1]) != 0:
+        category_dropdown.value = list_cand_data[3]
+
+    if list_cand_data[2] is not None:
+        container.image_src = list_cand_data[3]
+        container.content = None
 
     def pick_files_result(e: ft.FilePickerResultEvent):
         global list_cand_data
-        # from ..functions.dialogs import error_dialogs
-        candidate_image_destination1 = r'/images'
-
-        if list_cand_data[1] is not False:
-            if len(list_cand_data[1]) != 0:
-                candidate_image_destination1 += rf'/{list_cand_data[1]}'
-                try:
-                    os.remove(candidate_image_destination1)
-                except FileNotFoundError:
-                    pass
+        from ..functions.dialogs import error_dialogs
 
         selected_image_name = "".join(map(lambda f: f.name, e.files)) if e.files else False
         selected_file_path = ", ".join(map(lambda f: f.path, e.files)) if e.files else False
+
         if selected_image_name is not False:
-            pass
+            list_cand_data[2] = selected_image_name
+            list_cand_data[3] = selected_file_path
+            container.image_src = selected_file_path
+            container.content = None
+            container.update()
+            try:
+                pass
+            except OSError:
+                container.content = ft.Text("Upload Image", font_family='Verdana', )
+                container.update()
+                list_cand_data[1] = ''
+                error_dialogs(page, "002")
         else:
             container.image_src = None
             container.content = ft.Text("Upload canceled!", font_family='Verdana', )
             container.update()
+        disable_button(e)
 
     pick_files_dialog = ft.FilePicker(on_result=pick_files_result)
     page.overlay.append(pick_files_dialog)
@@ -235,7 +242,7 @@ def build(page: ft.Page):
                                     name_entry,
                                     category_dropdown,
                                 ],
-                                spacing=40,
+                                spacing=35,
                             )
                         ],
                         height=300,
