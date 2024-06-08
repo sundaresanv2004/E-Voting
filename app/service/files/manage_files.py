@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import pandas as pd
 
@@ -45,5 +46,13 @@ def create_candidate() -> None:
     if dict_data is None:
         df = pd.DataFrame(columns=['EMPTY TABLE'])
     else:
-        df = pd.DataFrame(dict_data)
+        df = pd.DataFrame(dict_data.values(), index=list(dict_data.keys()))
     df.to_json(path + file_path['candidate_data'], index=False, orient='table')
+
+
+def remove_files() -> None:
+    try:
+        os.remove(path + file_path['category_data'])
+        os.remove(path + file_path['candidate_data'])
+    except FileNotFoundError:
+        pass

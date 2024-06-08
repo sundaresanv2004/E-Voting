@@ -1,10 +1,9 @@
-from time import sleep
 import flet as ft
 import pandas as pd
 
 import app.service.user.login_auth as cc
-from app.pages.candidate_add import candidate_add_page
-from app.service.files.manage_files import create_category, create_candidate
+from .candidate_add import candidate_add_page
+from ..service.files.manage_files import create_category, create_candidate, remove_files
 
 old_data = None
 
@@ -62,15 +61,17 @@ def menubar_page(page: ft.Page) -> None:
             from .settings import settings_page
             settings_page(page, main_column)
         elif e == 4:
-            # dia = loading_dialogs1(page, "Logging out...")
+            # dia = loading_dialogs(page, "Logging out...")
             old_data = None
-            # dia.open = False
-            page.update()
-            page.clean()
-            page.splash = None
             page.update()
             from main import main
+            remove_files()
+            page.clean()
+            page.splash = None
+            # dia.open = False
+            page.update()
             main(page)
+
         page.update()
 
     home = ft.TextButton(
@@ -118,7 +119,7 @@ def menubar_page(page: ft.Page) -> None:
                                     ft.CircleAvatar(
                                         content=ft.Text(
                                             value=cc.auth_data['displayName'][0].upper(),
-                                            size=25,
+                                            size=22,
                                         ),
                                     ),
                                     ft.Text(

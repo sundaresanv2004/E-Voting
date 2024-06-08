@@ -4,6 +4,7 @@ import pandas as pd
 from ..functions.dialogs import message_dialogs
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
+from ..service.firebase.realtime_db import get_image_url
 
 column_1 = ft.Column()
 main_column1 = None
@@ -11,12 +12,13 @@ search_entry = ft.TextField(
     hint_text="Search",
     hint_style=ft.TextStyle(color='f2f9f9', font_family='Verdana'),
     width=450,
+    filled=False,
     border=ft.InputBorder.OUTLINE,
-    height=55,
+    height=50,
     disabled=True,
-    border_radius=50,
-    focused_border_color='#f2f9f9',
-    border_color='#ddeff0',
+    border_radius=55,
+    # focused_border_color='#f2f9f9',
+    # border_color='#ddeff0',
     prefix_style=ft.TextStyle(color=ft.colors.WHITE),
     text_style=ft.TextStyle(font_family='Verdana'),
     prefix_icon=ft.icons.SEARCH_ROUNDED,
@@ -54,7 +56,7 @@ def candidate_home_page(page: ft.Page, main_column: ft.Column):
 def search_display_candidate(page: ft.Page):
     # file
     candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
-    name_enc = candidate_data_df['candidate_name'].to_list()
+    name_enc = candidate_data_df['name'].to_list()
     cat_enc = list(candidate_data_df['category'].unique())
 
     row_can_data_list: list = []
@@ -123,38 +125,29 @@ class ViewStaffRecord(ft.UserControl):
         pass
 
     def profile(self, e):
-        pass
+        from .candidate_profile import candidate_profile_page
+        candidate_profile_page(self.page, self.index_val)
 
     def delete(self, e):
         pass
 
     def build(self):
-        if not self.candidate_data_df.loc[self.index_val].values[5]:
-            self_icon = ft.CircleAvatar(
-                content=ft.Icon(
-                    name=ft.icons.ACCOUNT_CIRCLE,
-                ),
-            )
-        else:
-            self_icon = ft.Container(
-                width=50,
-                height=50,
-                alignment=ft.alignment.center,
-                border_radius=50,
-                # image_src=self.candidate_image_destination + rf'/{self.candidate_data_df.loc[self.index_val].values[5]}',
-                image_fit=ft.ImageFit.COVER
-            )
+        self_icon = ft.CircleAvatar(
+            content=ft.Icon(
+                name=ft.icons.ACCOUNT_CIRCLE,
+            ),
+        )
 
         single_box_row = ft.Card(
             ft.Container(
                 ft.ListTile(
                     leading=self_icon,
                     title=ft.Text(
-                        value=f"{self.candidate_data_df.loc[self.index_val].values[1]}",
+                        value=f"{self.candidate_data_df.at[self.index_val, 'name']}",
                         font_family='Verdana',
                     ),
                     subtitle=ft.Text(
-                        value=f"{self.candidate_data_df.loc[self.index_val].values[2]}",
+                        value=f"{self.candidate_data_df.at[self.index_val, 'category']}",
                         font_family='Verdana',
                     ),
                     trailing=ft.PopupMenuButton(

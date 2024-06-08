@@ -25,7 +25,7 @@ def app_data(info_dict: dict) -> None:
         "final_nomination": False,
         "lock_data": False,
         "result": False,
-        "created_datetime": info_dict['created_datetime'],
+        "created_at": info_dict['created_datetime'],
     }
 
     db.collection('settings').document('election_settings').set(election_dict)
@@ -79,10 +79,10 @@ def read_category_data() -> dict:
 def add_category_data(category) -> None:
     db = firestore.client()
     category_dict = {
-        'id': str(uuid.uuid4()),
+        'category_id': str(uuid.uuid4()),
         'category_name': category,
         'order': None,
-        'created_datetime': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        'created_at': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
     db.collection('category').document(category).set(category_dict)
 

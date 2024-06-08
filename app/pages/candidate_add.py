@@ -3,7 +3,7 @@ import flet as ft
 import pandas as pd
 
 from .category import category_add_page
-import app.service.user.login_auth as cc
+from ..functions.dialogs import loading_dialogs
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
 
@@ -106,20 +106,18 @@ def build(page: ft.Page):
         global list_cand_data, alertdialog_candidate_add
         alertdialog_candidate_add.open = False
         page.splash = ft.ProgressBar()
+        dig = loading_dialogs(page, "Saving...")
         page.update()
-        # from ..service.files.write_files import add_candidate
+        from ..service.firebase.realtime_db import add_candidate
         from ..functions.snack_bar import snackbar
-        sleep(0.2)
-        if list_cand_data[1] is not False:
-            if len(list_cand_data[1]) == 0:
-                image_data = False
-            else:
-                image_data = list_cand_data[1]
-        else:
-            image_data = False
-        # add_candidate([name_entry.value, category_dropdown.value, True, qualification_dropdown.value, image_data,
-        #                cc.teme_data[1]])
+        add_candidate([
+            name_entry.value,
+            category_dropdown.value,
+            list_cand_data[2],
+            list_cand_data[3],
+        ])
         page.splash = None
+        dig.open = False
         page.update()
         from .candidate_home import display_candidate
         display_candidate(page)
