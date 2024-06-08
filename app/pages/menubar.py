@@ -20,12 +20,6 @@ def menubar_page(page: ft.Page) -> None:
         on_click=add_candidate_page_fun,
     )
 
-    add_staff_button = ft.FloatingActionButton(
-        icon=ft.icons.PERSON_ADD_ALT_1_ROUNDED,
-        tooltip="Add new Staff",
-        # on_click=lambda _: staff_add_page(page),
-    )
-
     def on_option_click(e):
         page.splash = ft.ProgressBar()
         global old_data
@@ -62,8 +56,8 @@ def menubar_page(page: ft.Page) -> None:
             # election_settings_page(page, main_column)
         elif e == 3:
             settings.icon = ft.icons.SETTINGS
-            # from .settings import settings_page
-            # settings_page(page, main_column)
+            from .settings import settings_page
+            settings_page(page, main_column)
         elif e == 4:
             # dia = loading_dialogs1(page, "Logging out...")
             old_data = None
@@ -175,7 +169,7 @@ def menubar_page(page: ft.Page) -> None:
 
     page.add(container)
     page.update()
-    on_option_click(1)
+    on_option_click(0)
 
 
 def update():

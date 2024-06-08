@@ -58,7 +58,8 @@ def email_code(code, email, subject):
 
 def verify_code_email(page: ft.Page, email, subject) -> bool:
     ver_code = str(random.randint(1000, 99999))
-    email_code(ver_code, email, subject)
+    print(ver_code)
+    # email_code(ver_code, email, subject)
 
     ver.verification_dialogs(page, email, ver_code)
 

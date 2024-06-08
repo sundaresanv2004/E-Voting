@@ -1,16 +1,22 @@
 import flet as ft
 import pandas as pd
 
-from app.functions.connection_setup import connection_setup
-from app.service.files.check_installation import path
-from app.service.files.local_files_scr import file_path
-from app.service.firebase.connect_firebase import delete_firebase_admin_app
+from .connection_setup import connection_setup
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
+from ..service.files.settings_file import delete_election_data
+from .snack_bar import snackbar
+from ..service.firebase.connect_firebase import delete_firebase_admin_app
 
 
-def manage_db_dialogs(page: ft.Page):
+def manage_db_dialogs(page: ft.Page, admin: bool):
     def on_close(e):
         manage_db_alertdialog.open = False
         page.update()
+
+    def on_delete(e):
+        on_close(e)
+        delete_connection(page, dropdown.value)
 
     def new_connection(e):
         on_close(e)
@@ -18,7 +24,7 @@ def manage_db_dialogs(page: ft.Page):
 
     dropdown = ft.Dropdown(
         label="Current Connection",
-        width=400,
+        width=450,
         filled=False,
         border=ft.InputBorder.OUTLINE,
         border_radius=10,
@@ -46,8 +52,29 @@ def manage_db_dialogs(page: ft.Page):
             page.clean()
             from main import main
             main(page)
+            snackbar(page, "Connection Updated")
         else:
             on_close(e)
+
+    row_options = ft.Row(
+        [
+            ft.TextButton(
+                text="Add Connection",
+                icon=ft.icons.ADD_ROUNDED,
+                on_click=new_connection,
+            ),
+        ],
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+    )
+
+    if admin:
+        row_options.controls.append(
+            ft.TextButton(
+                text="Remove Connection",
+                icon=ft.icons.DELETE_ROUNDED,
+                on_click=on_delete,
+            ),
+        )
 
     manage_db_alertdialog = ft.AlertDialog(
         modal=False,
@@ -58,11 +85,7 @@ def manage_db_dialogs(page: ft.Page):
         content=ft.Column(
             [
                 dropdown,
-                ft.TextButton(
-                    text="New Connection",
-                    icon=ft.icons.ADD_ROUNDED,
-                    on_click=new_connection,
-                ),
+                row_options,
             ],
             height=110,
             spacing=10
@@ -82,4 +105,71 @@ def manage_db_dialogs(page: ft.Page):
     # Open dialog
     page.dialog = manage_db_alertdialog
     manage_db_alertdialog.open = True
+    page.update()
+
+
+def delete_connection(page: ft.Page, election_name: str):
+    def on_close(e):
+        remove_db_alertdialog.open = False
+        page.update()
+
+    def on_delete(e):
+        if box_entry.value == election_name:
+            on_close(e)
+            box_entry.error_text = None
+            delete_election_data()
+            delete_firebase_admin_app()
+            page.clean()
+            from main import main
+            main(page)
+            snackbar(page, "Connection Removed")
+        else:
+            box_entry.error_text = "Invalid election name!"
+            box_entry.focus()
+        page.update()
+
+    box_entry = ft.TextField(
+        width=480,
+        filled=False,
+        border=ft.InputBorder.OUTLINE,
+        border_radius=10,
+        border_color=ft.colors.BLACK,
+        autofocus=True,
+        text_style=ft.TextStyle(font_family='Verdana'),
+        error_style=ft.TextStyle(font_family='Verdana'),
+    )
+
+    remove_db_alertdialog = ft.AlertDialog(
+        modal=False,
+        title=ft.Text(
+            value="Remove Firebase Connections",
+            weight=ft.FontWeight.W_500,
+        ),
+        content=ft.Column(
+            [
+                ft.Text(
+                    value=f"To confirm, type '{election_name}' in the box below",
+                    font_family='Verdana',
+                    weight=ft.FontWeight.W_400,
+                ),
+                box_entry
+            ],
+            height=110,
+            spacing=10
+        ),
+        actions=[
+            ft.TextButton(
+                text="Cancel",
+                on_click=on_close,
+            ),
+            ft.TextButton(
+                text="Remove",
+                on_click=on_delete,
+            ),
+        ]
+    )
+
+    # Open dialog
+    page.dialog = remove_db_alertdialog
+    remove_db_alertdialog.open = True
     page.update()

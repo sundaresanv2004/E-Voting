@@ -229,7 +229,6 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                             page.update()
                             if verify_code_email(page, mail_id_entry.value, "Your One-Time Verification Code"):
                                 sleep(0.5)
-
                                 from ..service.firebase.firestore import app_data, system_data
                                 from ..service.firebase.auth import create_user
                                 create_user(page, {
@@ -247,8 +246,6 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                     }
                                 )
                                 system_data(True)
-
-                                sleep(1)
                                 content_column.clean()
                                 page.update()
                                 from .all_done import all_done_page
@@ -268,7 +265,6 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                 mail_id_entry.disabled = False
                                 button_container.disabled = False
                                 button_container.opacity = 1
-                                mail_id_entry.error_text = "Enter the valid email address"
                                 mail_id_entry.suffix_icon = ft.icons.CLOSE_ROUNDED
                                 page.update()
                         else:

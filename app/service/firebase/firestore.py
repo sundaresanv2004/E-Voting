@@ -6,7 +6,7 @@ import firebase_admin
 import pandas as pd
 from firebase_admin import firestore
 
-from .connect_firebase import election_name
+import app.service.firebase.connect_firebase as connect_firebase
 from ..files.check_installation import path
 from ..files.local_files_scr import file_path
 from ...functions.dialogs import network_error
@@ -28,11 +28,6 @@ def app_data(info_dict: dict) -> None:
     }
 
     db.collection('settings').document('election_settings').set(election_dict)
-
-    ele_data = pd.read_csv(path + file_path['election_data'])
-    ele_path_data = ele_data[ele_data.election_name == election_name]
-    ele_data.at[ele_path_data.index.values[0], 'authenticated'] = True
-    ele_data.to_csv(path + file_path['election_data'], index=False)
 
 
 def system_data(status: bool) -> None:
@@ -60,15 +55,15 @@ def system_data(status: bool) -> None:
     system_info['system_id'] = system_id
     db.collection('system_data').document(system_id).set(system_info)
 
+    ele_data = pd.read_csv(path + file_path['election_data'], index_col='election_name')
+    ele_data.at[connect_firebase.election_name, 'authenticated'] = True
+    ele_data.to_csv(path + file_path['election_data'], index=True)
+
 
 def read_home_data() -> dict:
     db = firestore.client()
-    collections = db.collection('settings').stream()
-    data_dict = {}
-    for collection in collections:
-        data_dict[collection.id] = collection.to_dict()
-
-    return data_dict
+    collections = db.collection('settings').document('appdata').get().to_dict()
+    return collections
 
 
 def read_category_data() -> dict:
@@ -83,4 +78,3 @@ def add_category_data(category) -> None:
         str(uuid.uuid4()): category
     }
     db.collection('general').document('category_data').update(category_dict)
-

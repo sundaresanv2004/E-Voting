@@ -4,6 +4,7 @@ import re
 from ..service.files.local_files_scr import firebase_project
 from ..service.files.manage_files import create_connection_json, upload_config_file
 from ..service.firebase.connect_firebase import delete_firebase_admin_app
+from .snack_bar import snackbar
 
 selected_file_name = None
 
@@ -53,6 +54,7 @@ def connection_setup(page: ft.Page, new: bool):
                     if new is False:
                         delete_firebase_admin_app()
                     page.update()
+                    snackbar(page, "Connection added")
                     from main import main
                     page.clean()
                     main(page)
