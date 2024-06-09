@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 
 import firebase_admin
-import google
 import pandas as pd
 from firebase_admin import firestore
 
@@ -13,9 +12,16 @@ from ..files.local_files_scr import file_path
 from ...functions.dialogs import network_error
 
 
-def app_data(info_dict: dict) -> None:
+def app_data(info_list: list) -> None:
     db = firestore.client()
-    db.collection('settings').document('appdata').set(info_dict)
+    dict_data = {
+        "institution_name": info_list[0],
+        "election_name": info_list[1],
+        "created_at": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        "app_version": "6.06"
+    }
+
+    db.collection('settings').document('appdata').set(dict_data)
 
     election_dict = {
         "vote_option": False,
@@ -24,7 +30,7 @@ def app_data(info_dict: dict) -> None:
         "final_nomination": False,
         "lock_data": False,
         "result": False,
-        "created_at": info_dict['created_datetime'],
+        "created_at": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
 
     db.collection('settings').document('election_settings').set(election_dict)
@@ -91,3 +97,11 @@ def add_category_data(category) -> None:
     else:
         category_df = pd.DataFrame(category_dict, index=[category_df])
     category_df.to_csv(path + file_path['category_data'], index=False)
+
+
+def update_appdata_name(data: dict) -> None:
+    db = firestore.client()
+    db.collection('settings').document('appdata').update(data)
+    home_data = pd.read_json(path + file_path['app_data'], orient='table')
+    home_data.at[0, list(data.keys())[0]] = list(data.values())[0]
+    home_data.to_json(path + file_path['app_data'], orient='table', index=False)

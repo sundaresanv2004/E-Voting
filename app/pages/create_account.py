@@ -237,14 +237,10 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                     "email": mail_id_entry.value,
                                 })
 
-                                app_data(
-                                    {
-                                        "institution_name": institution_name,
-                                        "election_name": election_name,
-                                        "created_at": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                                        "app_version": "6.06"
-                                    }
-                                )
+                                app_data([
+                                    institution_name,
+                                    election_name
+                                ])
                                 system_data(True)
                                 content_column.clean()
                                 page.update()

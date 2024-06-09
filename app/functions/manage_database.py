@@ -24,7 +24,7 @@ def manage_db_dialogs(page: ft.Page, admin: bool):
 
     dropdown = ft.Dropdown(
         label="Current Connection",
-        width=450,
+        width=500,
         filled=False,
         border=ft.InputBorder.OUTLINE,
         border_radius=10,
@@ -81,14 +81,15 @@ def manage_db_dialogs(page: ft.Page, admin: bool):
         title=ft.Text(
             value="Manage Firebase Connections",
             weight=ft.FontWeight.W_500,
+            font_family='Verdana',
         ),
         content=ft.Column(
             [
                 dropdown,
                 row_options,
             ],
-            height=110,
-            spacing=10
+            height=130,
+            spacing=20
         ),
         actions=[
             ft.TextButton(
@@ -112,6 +113,7 @@ def delete_connection(page: ft.Page, election_name: str):
     def on_close(e):
         remove_db_alertdialog.open = False
         page.update()
+        manage_db_dialogs(page, True)
 
     def on_delete(e):
         if box_entry.value == election_name:
@@ -129,7 +131,7 @@ def delete_connection(page: ft.Page, election_name: str):
         page.update()
 
     box_entry = ft.TextField(
-        width=480,
+        width=500,
         filled=False,
         border=ft.InputBorder.OUTLINE,
         border_radius=10,
@@ -144,6 +146,7 @@ def delete_connection(page: ft.Page, election_name: str):
         title=ft.Text(
             value="Remove Firebase Connections",
             weight=ft.FontWeight.W_500,
+            font_family='Verdana',
         ),
         content=ft.Column(
             [

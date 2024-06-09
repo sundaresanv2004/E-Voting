@@ -1,6 +1,7 @@
 import flet as ft
 import pandas as pd
 
+from .settings_options import institution_name_dialogs, election_name_dialogs, help_dialogs
 from ..functions.manage_database import manage_db_dialogs
 from ..functions.snack_bar import snackbar
 from ..service.files.check_installation import path
@@ -15,12 +16,11 @@ class SettingsMenu:
         super().__init__()
         self.page = page
         self.app_data = pd.read_json(path + file_path['app_data'], orient='table')
-        self.delete_election = None
         self.election_name = None
         self.help = None
         self.institution_name = None
         self.create_election = None
-        self.current_election = None
+        self.project = None
         self.next_icon = ft.Icon(
             name=ft.icons.NAVIGATE_NEXT_ROUNDED,
             size=25,
@@ -39,7 +39,7 @@ class SettingsMenu:
                     ),
                     subtitle=self.institution_name_text,
                     trailing=self.next_icon,
-                    # on_click=lambda _: institution_name_dialogs(self.page),
+                    on_click=lambda _: institution_name_dialogs(self.page),
                 ),
                 padding=ft.padding.symmetric(vertical=3.5),
                 blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
@@ -62,7 +62,7 @@ class SettingsMenu:
                     ),
                     subtitle=self.election_name_text,
                     trailing=self.next_icon,
-                    # on_click=lambda _: election_name_dialogs(self.page),
+                    on_click=lambda _: election_name_dialogs(self.page),
                 ),
                 padding=ft.padding.symmetric(vertical=3.5),
                 blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
@@ -103,7 +103,7 @@ class SettingsMenu:
                         value=f"Help",
                         font_family='Verdana',
                     ),
-                    # on_click=lambda _: help_dialogs(self.page),
+                    on_click=lambda _: help_dialogs(self.page),
                     trailing=self.next_icon,
                 ),
                 border_radius=10,
@@ -116,16 +116,31 @@ class SettingsMenu:
 
         return self.help
 
+    def create_project(self):
+        self.project = ft.Card(
+            ft.Container(
+                ft.ListTile(
+                    title=ft.Text(
+                        value=f"How to create Firebase Project",
+                        font_family='Verdana',
+                    ),
+                    # on_click=lambda _: help_dialogs(self.page),
+                    trailing=self.next_icon,
+                ),
+                blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
+                border_radius=10,
+                padding=ft.padding.symmetric(vertical=3.5),
+            ),
+            elevation=0,
+            color=ft.colors.with_opacity(0.5, '#44CCCCCC'),
+        )
+
+        return self.project
+
     def change_in_data(self):
         self.app_data = pd.read_json(path + file_path['app_data'], orient='table')
         self.institution_name_text.value = self.app_data.at[0, 'institution_name']
-        if len(pd.read_csv(path + file_path["election_data"])) == 1:
-            self.delete_election.disabled = True
-            self.delete_election.tooltip = 'Disabled'
-        else:
-            self.delete_election.disabled = False
-            self.delete_election.tooltip = None
-        self.election_name_text.value = self.app_data.at[0, 'institution_name']
+        self.election_name_text.value = self.app_data.at[0, 'election_name']
         self.page.update()
         snackbar(self.page, "Settings Updated.")
 
@@ -142,6 +157,7 @@ def settings_page(page: ft.Page, main_column: ft.Column):
                 option_menu.institution_name_option(),
                 option_menu.election_name_option(),
                 option_menu.manage_connection_option(),
+                option_menu.create_project(),
                 option_menu.help_option(),
             ],
             expand=True,
@@ -154,5 +170,4 @@ def settings_page(page: ft.Page, main_column: ft.Column):
 
 
 def update_settings_data():
-    pass
-    # var_option_data_update.change_in_data()
+    var_option_data_update.change_in_data()

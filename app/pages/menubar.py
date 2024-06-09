@@ -31,7 +31,10 @@ def menubar_page(page: ft.Page) -> None:
                 container.image_src = "/images/background-3.png"
                 home.icon = None
             elif old_data == 1:
-                page.remove(add_candidate_button)
+                try:
+                    page.remove(add_candidate_button)
+                except ValueError:
+                    pass
                 candidate.icon = None
             elif old_data == 2:
                 election.icon = None
@@ -54,8 +57,8 @@ def menubar_page(page: ft.Page) -> None:
             page.add(add_candidate_button)
         elif e == 2:
             election.icon = ft.icons.HOW_TO_VOTE
-            # from .election_settings import election_settings_page
-            # election_settings_page(page, main_column)
+            from .election_settings import election_settings_page
+            election_settings_page(page, main_column)
         elif e == 3:
             settings.icon = ft.icons.SETTINGS
             from .settings import settings_page
