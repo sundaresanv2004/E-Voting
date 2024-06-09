@@ -68,16 +68,15 @@ def candidate_profile_page(page: ft.Page, id_val):
     def delete_on_click(e):
         alertdialog.open = False
         page.update()
-        sleep(0.1)
-        # from .candidate_delete import delete_candidate_dialogs
-        # delete_candidate_dialogs(page, index_val, True)
+        from .candidate_delete import delete_candidate_dialogs
+        delete_candidate_dialogs(page, index_val, True)
 
     def edit_on_click(e):
         alertdialog.open = False
         page.update()
         sleep(0.2)
-        # from .candidate_edit import candidate_edit_page
-        # candidate_edit_page(page, index_val, True)
+        from .candidate_edit import candidate_edit_page
+        candidate_edit_page(page, index_val, True)
 
     title1 = ft.Text(
         weight=ft.FontWeight.W_500,

@@ -4,6 +4,7 @@ import pandas as pd
 
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
+from app.service.firebase.realtime_db import delete_candidate
 
 
 def delete_candidate_dialogs(page: ft.Page, index_df, view):
@@ -11,17 +12,11 @@ def delete_candidate_dialogs(page: ft.Page, index_df, view):
         page.snack_bar = ft.ProgressBar()
         page.update()
         from ..functions.snack_bar import snackbar
-        from ..functions.dialogs import loading_dialogs
         delete_candidate_dialogs1.open = False
-        dig = loading_dialogs(page, "Deleting...")
         page.update()
         from .candidate_home import display_candidate
-        # from ..service.files.write_files import delete_candidate
-        # from Main.service.scr.loc_file_scr import file_data
-        # import Main.service.scr.election_scr as ee
-        # delete_candidate(index_df)
+        delete_candidate(index_df)
         page.snack_bar = False
-        dig.open = False
         snackbar(page, "Successfully Deleted.")
         page.update()
         display_candidate(page)

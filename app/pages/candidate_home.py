@@ -100,7 +100,9 @@ def display_candidate(page):
                 alignment=ft.MainAxisAlignment.CENTER,
             )
         )
+        search_entry.disabled = True
         column_1.alignment = ft.MainAxisAlignment.CENTER
+        page.update()
     else:
         for i in range(len(candidate_data_df.index)):
             row_can_data_list.append(ViewStaffRecord(page, main_column1, i))
@@ -122,14 +124,16 @@ class ViewStaffRecord(ft.UserControl):
         self.candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
 
     def edit(self, e):
-        pass
+        from .candidate_edit import candidate_edit_page
+        candidate_edit_page(self.page, self.index_val, False)
 
     def profile(self, e):
         from .candidate_profile import candidate_profile_page
         candidate_profile_page(self.page, self.index_val)
 
     def delete(self, e):
-        pass
+        from .candidate_delete import delete_candidate_dialogs
+        delete_candidate_dialogs(self.page, self.index_val, False)
 
     def build(self):
         self_icon = ft.CircleAvatar(

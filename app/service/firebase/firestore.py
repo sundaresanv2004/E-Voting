@@ -18,7 +18,6 @@ def app_data(info_dict: dict) -> None:
     db.collection('settings').document('appdata').set(info_dict)
 
     election_dict = {
-        "election-name": info_dict['election_name'],
         "vote_option": False,
         "completed": False,
         "code": None,

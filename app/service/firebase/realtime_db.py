@@ -46,3 +46,34 @@ def add_candidate(data: list) -> None:
 def get_image_url(image_name: str) -> str:
     storage = connect_firebase.firebase.storage()
     return storage.child(image_name).get_url(None)
+
+
+def delete_candidate(candidate_index) -> None:
+    candidate_df = pd.read_json(path + file_path['candidate_data'], orient='table')
+    db = connect_firebase.firebase.database()
+    db.child('candidates').child(candidate_df.at[candidate_index, 'candidate_id']).remove(cc.auth_data['idToken'])
+    candidate_df.drop(candidate_index, inplace=True, axis=0)
+    candidate_df.to_json(path + file_path['candidate_data'], index=False, orient='table')
+
+
+def edit_candidate(candidate_index: int, candidate_data: list) -> None:
+    candidate_df = pd.read_json(path + file_path['candidate_data'], orient='table')
+    db = connect_firebase.firebase.database()
+    candidate_id = candidate_df.at[candidate_index, 'candidate_id']
+
+    data_dict = {
+        'candidate_id': candidate_id,
+        "name": candidate_data[0],
+        "category": candidate_data[1],
+        'updated_at': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+    }
+    if candidate_data[2] is not False:
+        add_image(candidate_data[3], candidate_data[2])
+        data_dict['image'] = f"images/{candidate_data[2]}"
+        candidate_df.at[candidate_index, 'image'] = f"images/{candidate_data[2]}"
+
+    candidate_df.at[candidate_index, 'name'] = candidate_data[0]
+    candidate_df.at[candidate_index, 'category'] = candidate_data[1]
+    candidate_df.at[candidate_index, 'updated_at'] = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    db.child('candidates').child(candidate_id).update(data_dict, cc.auth_data['idToken'])
+    candidate_df.to_json(path + file_path['candidate_data'], index=False, orient='table')
