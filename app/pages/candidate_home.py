@@ -55,9 +55,17 @@ def candidate_home_page(page: ft.Page, main_column: ft.Column):
 
 def search_display_candidate(page: ft.Page):
     # file
-    candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
-    name_enc = candidate_data_df['name'].to_list()
-    cat_enc = list(candidate_data_df['category'].unique())
+    candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    category_df = pd.read_csv(path + file_path['category_data'])
+
+    name_enc = candidate_df['name'].to_list()
+    cat_enc_dict = {}
+    for i in range(len(category_df)):
+        cat_enc_dict[category_df.at[i, 'category_name']] = category_df.at[i, 'category_id']
+
+    category_dict = {}
+    for i in range(len(category_df)):
+        category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
 
     row_can_data_list: list = []
     data_in: list = []
@@ -65,14 +73,16 @@ def search_display_candidate(page: ft.Page):
         for i in name_enc:
             if search_entry.value.lower() in i.lower():
                 if name_enc.index(i) not in data_in:
-                    row_can_data_list.append(ViewStaffRecord(page, main_column1, name_enc.index(i)))
+                    row_can_data_list.append(ViewCandidateRecord(page, main_column1, name_enc.index(i),
+                                                                 candidate_df, category_dict))
                     data_in.append(name_enc.index(i))
 
-        for j in cat_enc:
+        for j in list(cat_enc_dict.keys()):
             if search_entry.value.lower() in j.lower():
-                for k in list(candidate_data_df[candidate_data_df.category == j].index.values):
+                for k in list(candidate_df[candidate_df.category == cat_enc_dict[j]].index.values):
                     if k not in data_in:
-                        row_can_data_list.append(ViewStaffRecord(page, main_column1, k))
+                        row_can_data_list.append(ViewCandidateRecord(page, main_column1, k,
+                                                                     candidate_df, category_dict))
                         data_in.append(k)
 
         column_1.controls = row_can_data_list
@@ -84,11 +94,16 @@ def search_display_candidate(page: ft.Page):
 def display_candidate(page):
     global column_1
     # file
-    candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    category_df = pd.read_csv(path + file_path['category_data'])
+
+    category_dict = {}
+    for i in range(len(category_df)):
+        category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
 
     row_can_data_list = []
 
-    if candidate_data_df.empty is True:
+    if candidate_df.empty is True:
         row_can_data_list.append(
             ft.Row(
                 [
@@ -104,8 +119,8 @@ def display_candidate(page):
         column_1.alignment = ft.MainAxisAlignment.CENTER
         page.update()
     else:
-        for i in range(len(candidate_data_df.index)):
-            row_can_data_list.append(ViewStaffRecord(page, main_column1, i))
+        for i in range(len(candidate_df.index)):
+            row_can_data_list.append(ViewCandidateRecord(page, main_column1, i, candidate_df, category_dict))
         column_1.expand = True
         search_entry.disabled = False
         column_1.scroll = ft.ScrollMode.ADAPTIVE
@@ -114,14 +129,15 @@ def display_candidate(page):
     page.update()
 
 
-class ViewStaffRecord(ft.UserControl):
+class ViewCandidateRecord(ft.UserControl):
 
-    def __init__(self, page, column, index_val):
+    def __init__(self, page, column, index_val, candidate_df, category_dict):
         super().__init__()
         self.page = page
         self.index_val = index_val
         self.column = column
-        self.candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+        self.candidate_data_df = candidate_df
+        self.category_dict = category_dict
 
     def edit(self, e):
         from .candidate_edit import candidate_edit_page
@@ -151,7 +167,7 @@ class ViewStaffRecord(ft.UserControl):
                         font_family='Verdana',
                     ),
                     subtitle=ft.Text(
-                        value=f"{self.candidate_data_df.at[self.index_val, 'category']}",
+                        value=f"{self.category_dict[self.candidate_data_df.at[self.index_val, 'category']]}",
                         font_family='Verdana',
                     ),
                     trailing=ft.PopupMenuButton(

@@ -102,6 +102,8 @@ def build(page: ft.Page):
             save_button.disabled = True
         save_button.update()
 
+    category_df = pd.read_csv(path + file_path['category_data'])
+
     def save(e):
         global list_cand_data, alertdialog_candidate_add
         alertdialog_candidate_add.open = False
@@ -110,9 +112,11 @@ def build(page: ft.Page):
         page.update()
         from ..service.firebase.realtime_db import add_candidate
         from ..functions.snack_bar import snackbar
+        index_val = category_df[category_df.category_name == category_dropdown.value].index.values[0]
+        category = category_df.at[index_val, 'category_id']
         add_candidate([
             name_entry.value,
-            category_dropdown.value,
+            category,
             list_cand_data[2],
             list_cand_data[3],
         ])
@@ -126,20 +130,18 @@ def build(page: ft.Page):
 
     save_button.on_click = save
 
-    category_df = pd.read_csv(path + file_path['category_data'])
-
     # Input Field
     name_entry = ft.TextField(
         hint_text="Enter the Candidate name",
         width=350,
         border=ft.InputBorder.OUTLINE,
         border_radius=9,
-        text_style=ft.TextStyle(font_family='Verdana'),
-        error_style=ft.TextStyle(font_family='Verdana'),
         autofocus=True,
         capitalization=ft.TextCapitalization.WORDS,
         prefix_icon=ft.icons.PERSON_ROUNDED,
         on_change=disable_button,
+        text_style=ft.TextStyle(font_family='Verdana'),
+        error_style=ft.TextStyle(font_family='Verdana'),
     )
 
     category_dropdown = ft.Dropdown(
@@ -148,6 +150,7 @@ def build(page: ft.Page):
         border=ft.InputBorder.OUTLINE,
         border_radius=9,
         text_style=ft.TextStyle(font_family='Verdana'),
+        error_style=ft.TextStyle(font_family='Verdana'),
         color=ft.colors.BLACK,
         options=[
             ft.dropdown.Option("Select Candidate Qualification"),
@@ -160,8 +163,8 @@ def build(page: ft.Page):
         content=ft.Text("Upload Image", font_family='Verdana'),
         width=200,
         height=250,
-        alignment=ft.alignment.center,
         border=ft.border.all(1, ft.colors.BLACK),
+        alignment=ft.alignment.center,
         border_radius=10,
         image_fit=ft.ImageFit.COVER,
     )

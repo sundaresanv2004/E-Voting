@@ -4,7 +4,130 @@ from time import sleep
 
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
-from app.service.firebase.firestore import read_category_data, add_category_data
+from app.service.files.manage_files import create_category
+from app.service.firebase.firestore import add_category_data
+
+
+def category_dialogs(page: ft.Page):
+    create_category()
+
+    category_dialogs1 = ft.AlertDialog(
+        modal=True,
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    def on_close(e):
+        category_dialogs1.open = False
+        page.update()
+
+    def add_cat(e):
+        category_dialogs1.open = False
+        page.update()
+        sleep(0.2)
+        category_add_page(page, 'category')
+
+    # Read category data
+    category_data_df = pd.read_csv(path + file_path['category_data'])
+
+    # Table
+    category_data_table = ft.DataTable(
+        column_spacing=20,
+        expand=True,
+        columns=[
+            ft.DataColumn(ft.Text("#")),
+            ft.DataColumn(ft.Text("Category ID")),
+            ft.DataColumn(ft.Text("Category")),
+            ft.DataColumn(ft.Text("Created On")),
+        ],
+    )
+
+    category_data_row: list = []
+    if len(category_data_df) != 0:
+        for i in range(len(category_data_df)):
+            category_data_row.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(value=f"{i + 1}")),
+                        ft.DataCell(ft.Text(value=f"{category_data_df.at[i, 'category_id']}")),
+                        ft.DataCell(ft.Text(value=f"{category_data_df.at[i, 'category_name']}")),
+                        ft.DataCell(ft.Text(value=f"{category_data_df.at[i, 'created_at']}")),
+                        # ft.DataCell(CategoryView(page, i, category_dialogs1, category_data_df))
+                    ],
+                )
+            )
+
+    category_data_table.rows = category_data_row
+    data_list1: list = [
+        ft.Row(
+            [
+                category_data_table,
+            ],
+        )
+    ]
+
+    if len(category_data_df) == 0:
+        data_list1.append(
+            ft.Row(
+                [
+                    ft.Text(
+                        value="No Records",
+                        size=20,
+                    )
+                ],
+                width=700,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+            )
+        )
+
+    # AlertDialog data
+    category_dialogs1.content = ft.Column(
+        [
+            ft.Row(
+                [
+                    ft.Row(
+                        [
+                            ft.Text(
+                                value="Category",
+                                weight=ft.FontWeight.BOLD,
+                                size=25,
+                                font_family='Verdana',
+                            ),
+                        ],
+                        expand=True,
+                    ),
+                    ft.Row(
+                        [
+                            ft.IconButton(
+                                icon=ft.icons.CLOSE_ROUNDED,
+                                tooltip="Close",
+                                on_click=on_close,
+                            )
+                        ]
+                    )
+                ],
+                width=760,
+            ),
+            ft.Column(
+                controls=data_list1,
+            )
+        ],
+        scroll=ft.ScrollMode.ADAPTIVE,
+        height=450,
+        width=780,
+    )
+
+    category_dialogs1.actions = [
+        ft.TextButton(
+            text="Add new category",
+            on_click=add_cat,
+        )
+    ]
+
+    # Open dialog
+    page.dialog = category_dialogs1
+    category_dialogs1.open = True
+    page.update()
 
 
 def category_add_page(page: ft.Page, page_view):

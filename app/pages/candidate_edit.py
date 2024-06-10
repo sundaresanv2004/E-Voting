@@ -75,9 +75,15 @@ def candidate_edit_page(page: ft.Page, index_val, page_view):
 def build(page: ft.Page, index_val, page_view):
     global list_cand_data_edit
     candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
-    candidate_data = candidate_df.loc[index_val].values
+    category_df = pd.read_csv(path + file_path['category_data'])
+
+    category_dict = {}
+    for i in range(len(category_df)):
+        category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
+        category_dict[category_df.at[i, 'category_name']] = category_df.at[i, 'category_id']
+
     list_cand_data_edit[0] = candidate_df.at[index_val, 'name']
-    list_cand_data_edit[1] = candidate_df.at[index_val, 'category']
+    list_cand_data_edit[1] = category_dict[candidate_df.at[index_val, 'category']]
     list_cand_data_edit[2] = candidate_df.at[index_val, 'image']
 
     def disable_button(e):
@@ -95,7 +101,7 @@ def build(page: ft.Page, index_val, page_view):
         else:
             list_value[0] = False
 
-        if category_dropdown.value != candidate_df.at[index_val, 'category']:
+        if category_dropdown.value != category_dict[candidate_df.at[index_val, 'category']]:
             if len(category_dropdown.value) != 0:
                 category_dropdown.error_text = None
                 category_dropdown.update()
@@ -131,10 +137,11 @@ def build(page: ft.Page, index_val, page_view):
         from ..functions.snack_bar import snackbar
         if list_cand_data_edit[2] == candidate_df.at[index_val, 'image']:
             list_cand_data_edit[2] = False
+
         edit_candidate(
             index_val,
             [name_entry.value,
-             category_dropdown.value,
+             category_dict[category_dropdown.value],
              list_cand_data_edit[2],
              list_cand_data_edit[3]
              ])

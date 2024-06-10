@@ -83,17 +83,18 @@ def read_category_data() -> dict:
 
 def add_category_data(category) -> None:
     db = firestore.client()
+    category_id = str(uuid.uuid4())
     category_dict = {
-        'category_id': str(uuid.uuid4()),
+        'category_id': category_id,
         'category_name': category,
         'order': None,
         'created_at': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
-    db.collection('category').document(category).set(category_dict)
+    db.collection('category').document(category_id).set(category_dict)
 
     category_df = pd.read_csv(path + file_path['category_data'])
     if category_df.empty is False:
-        category_df.loc[category] = category_dict
+        category_df.loc[category_id] = category_dict
     else:
         category_df = pd.DataFrame(category_dict, index=[category_df])
     category_df.to_csv(path + file_path['category_data'], index=False)

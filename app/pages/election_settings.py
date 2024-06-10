@@ -1,6 +1,7 @@
 import flet as ft
 import pandas as pd
 
+from .category import category_dialogs
 from .election_options import category_order, forgot_code, generate_result, result_view_dialogs
 from .settings_options import help_dialogs
 
@@ -23,7 +24,7 @@ def election_settings_page(page: ft.Page, main_column: ft.Column):
                     name=ft.icons.NAVIGATE_NEXT_ROUNDED,
                     size=25,
                 ),
-                # on_click=lambda _: category_dialogs(page),
+                on_click=lambda _: category_dialogs(page),
             ),
             blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
             padding=ft.padding.symmetric(vertical=3.5),

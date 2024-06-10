@@ -13,6 +13,10 @@ def candidate_profile_page(page: ft.Page, id_val):
     global index_val
 
     candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    category_df = pd.read_csv(path + file_path['category_data'])
+    category_dict = {}
+    for i in range(len(category_df)):
+        category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
 
     def on_close(e):
         alertdialog.open = False
@@ -109,7 +113,7 @@ def candidate_profile_page(page: ft.Page, id_val):
         button_check()
         title1.value = f"Candidate ID: {candidate_data_df.at[index_val, 'candidate_id']}"
         name_text.value = f"Name: {candidate_data_df.at[index_val, 'name']}"
-        category_text.value = f"Category: {candidate_data_df.at[index_val, 'category']}"
+        category_text.value = f"Category: {category_dict[candidate_data_df.at[index_val, 'category']]}"
         added_on_text.value = f"Created on: {candidate_data_df.at[index_val, 'created_at']}"
         added_by_text.value = f"Updated on: {candidate_data_df.at[index_val, 'updated_at']}"
         container.content = ft.Text()
