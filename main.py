@@ -5,6 +5,7 @@ from app.functions.window_actions import window_at_start, window_on_resize
 from app.pages.menubar import menubar_page
 from app.pages.start_menu import start_menu_page
 from app.service.files.check_installation import installation_requirement
+from app.service.files.manage_files import create_election_settings
 from app.service.firebase.check_files import check_connection_files
 from app.service.user.login_auth import check_login
 
@@ -59,11 +60,12 @@ def main(page: ft.Page):
         )
     )
 
-    # page.add(bg_container)
+    page.add(bg_container)
     check_connection_files(page)
-    check_login('admin@gmail.com', 'admin1234')
-    menubar_page(page)
-    # start_menu_page(page, content_image, content_column)
+    # create_election_settings()
+    # check_login('admin@gmail.com', 'admin1234')
+    # menubar_page(page)
+    start_menu_page(page, content_image, content_column)
 
 
 if __name__ == '__main__':

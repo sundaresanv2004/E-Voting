@@ -17,6 +17,7 @@ file_path = read_file(r"/data/file_path.json")
 default_setting_data = read_file(r"/data/default_setting.json")
 warnings = read_file(r"/messages/warning.json")
 error_data = read_file(r"/messages/error.json")
+messages = read_file(r"/messages/message.json")
 # default_election_settings = read_file(r"/data/default_election_settings.json")
 
 

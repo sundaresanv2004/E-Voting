@@ -6,9 +6,11 @@ from .create_account import create_account_page
 from .login import login_page
 from ..service.files.check_installation import new_start
 import app.service.firebase.connect_firebase as ser
+from ..service.files.manage_files import create_election_settings
 
 
 def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: ft.Column):
+    create_election_settings()
     settings_button = ft.FloatingActionButton(
         icon=ft.icons.CLOUD_SYNC_ROUNDED,
         tooltip="Manage Firebase Connection",

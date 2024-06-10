@@ -46,13 +46,13 @@ def menubar_page(page: ft.Page) -> None:
         if e == 0:
             container.image_src = "/images/background-2.png"
             home.icon = ft.icons.HOME_ROUNDED
+            create_candidate()
+            create_category()
             from .home import home_page
             home_page(page, main_column)
         elif e == 1:
             candidate.icon = ft.icons.SUPERVISED_USER_CIRCLE
             from .candidate_home import candidate_home_page
-            create_category()
-            create_candidate()
             candidate_home_page(page, main_column)
             page.add(add_candidate_button)
         elif e == 2:

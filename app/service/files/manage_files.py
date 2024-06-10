@@ -50,6 +50,12 @@ def create_candidate() -> None:
     df.to_json(path + file_path['candidate_data'], index=False, orient='table')
 
 
+def create_election_settings() -> None:
+    from ..firebase.firestore import read_election_settings
+    df = pd.DataFrame(read_election_settings(), index=[0])
+    df.to_json(path + file_path['election_settings'], orient='table', index=False)
+
+
 def remove_files() -> None:
     try:
         os.remove(path + file_path['category_data'])

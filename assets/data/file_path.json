@@ -2,7 +2,7 @@
   "name": "file_path",
   "version": "6.01",
   "app_data": "/data/a/app_data.json",
-  "admin_files": "/data/a/admin_files",
+  "election_settings": "/data/a/election_settings.json",
   "candidate_data": "/data/a/candidate_data.json",
   "category_data": "/data/a/category_data.csv",
   "election_files": "/data/e/election_files",

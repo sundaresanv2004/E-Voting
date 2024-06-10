@@ -9,6 +9,7 @@ from firebase_admin import firestore
 import app.service.firebase.connect_firebase as connect_firebase
 from ..files.check_installation import path
 from ..files.local_files_scr import file_path
+from ..files.manage_files import create_category
 from ...functions.dialogs import network_error
 
 
@@ -81,6 +82,12 @@ def read_category_data() -> dict:
     return dict1
 
 
+def read_election_settings() -> dict:
+    db = firestore.client()
+    collections = db.collection('settings').document('election_settings').get().to_dict()
+    return collections
+
+
 def add_category_data(category) -> None:
     db = firestore.client()
     category_id = str(uuid.uuid4())
@@ -106,3 +113,30 @@ def update_appdata_name(data: dict) -> None:
     home_data = pd.read_json(path + file_path['app_data'], orient='table')
     home_data.at[0, list(data.keys())[0]] = list(data.values())[0]
     home_data.to_json(path + file_path['app_data'], orient='table', index=False)
+
+
+def update_category_data(data: list) -> None:
+    db = firestore.client()
+    category_df = pd.read_csv(path + file_path['category_data'])
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
+
+    category_dict = {}
+    for i in range(len(category_df)):
+        category_dict[category_df.at[i, 'category_name']] = category_df.at[i, 'category_id']
+
+    for i, n in enumerate(data):
+        db.collection('category').document(category_dict[n]).update({'order': i+1})
+
+    election_dict = {
+        "vote_option": True,
+        "final_nomination": True,
+        "lock_data": True,
+    }
+    db.collection('settings').document('election_settings').update(election_dict)
+    ele_ser_1.at[0, 'vote_option'] = True
+    ele_ser_1.at[0, 'final_nomination'] = True
+    ele_ser_1.at[0, 'lock_data'] = True
+    ele_ser_1.to_json(path + file_path['election_settings'], orient='table', index=False)
+    create_category()
+
+
