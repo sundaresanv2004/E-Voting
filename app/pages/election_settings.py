@@ -2,7 +2,8 @@ import flet as ft
 import pandas as pd
 
 from .category import category_dialogs
-from .election_options import category_order  # , forgot_code, generate_result, result_view_dialogs
+from .election_options import category_order, vote_options, \
+    download_nomination  # , forgot_code, generate_result, result_view_dialogs
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
 
@@ -13,6 +14,7 @@ class ElectionSettingsMenu:
 
     def __init__(self, page: ft.Page):
         super().__init__()
+        self.vote_button = None
         self.page = page
         self.final_nomination_list = None
         self.download_result = None
@@ -20,12 +22,32 @@ class ElectionSettingsMenu:
         self.view_result = None
         self.summary_view_result = None
         self.forgot_passcode = None
-
+        self.vote_switch = ft.Switch(on_change=lambda _: vote_options(self.vote_switch.value))
         self.ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
         self.tot_no_vote = ft.Text(value="Total no.of votes: 0", font_family='Verdana')
         self.next_icon = ft.Icon(
             name=ft.icons.NAVIGATE_NEXT_ROUNDED,
             size=25,
+        )
+
+    def vote_option(self):
+        self.vote_button = ft.Container(
+            ft.ListTile(
+                title=ft.Text(
+                    font_family='Verdana',
+                    value=f"Vote Option",
+                ),
+                trailing=self.vote_switch,
+            ),
+            blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
+            padding=ft.padding.symmetric(vertical=3.5),
+            border_radius=10,
+        )
+
+        return ft.Card(
+            self.vote_button,
+            elevation=0,
+            color=ft.colors.with_opacity(0.4, '#44CCCCCC'),
         )
 
     def final_nomination_list_option(self):
@@ -121,7 +143,7 @@ class ElectionSettingsMenu:
                     value=f"Download Nomination List",
                     font_family='Verdana',
                 ),
-                # on_click=lambda _: download_nomination(self.page),
+                on_click=lambda _: download_nomination(self.page),
                 trailing=self.next_icon,
             ),
             padding=ft.padding.symmetric(vertical=3.5),
@@ -139,10 +161,19 @@ class ElectionSettingsMenu:
         candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
         self.ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
 
-        print(self.ele_ser_1.to_string())
-
         if candidate_df.empty is False:
-            self.final_nomination_list.disabled = False
+            if not self.ele_ser_1.at[0, 'result']:
+                self.final_nomination_list.disabled = False
+
+        if self.ele_ser_1.at[0, 'final_nomination']:
+            self.vote_button.disabled = False
+        else:
+            self.vote_button.disabled = True
+
+        if self.ele_ser_1.at[0, 'vote_option']:
+            self.vote_switch.value = True
+        else:
+            self.vote_switch.value = False
 
         if self.ele_ser_1.at[0, 'final_nomination']:
             self.download_nomination.disabled = False
@@ -196,7 +227,7 @@ def election_settings_page(page: ft.Page, main_column: ft.Column):
                     # option_menu_ele.lock_election_option(),
                     option_menu_ele.final_nomination_list_option(),
                     option_menu_ele.download_nomination_option(),
-                    # option_menu_ele.vote_option(),
+                    option_menu_ele.vote_option(),
                     # option_menu_ele.generate_result_option(),
                     option_menu_ele.view_result_option(),
                     option_menu_ele.summary_view_result_option(),

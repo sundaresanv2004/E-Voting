@@ -57,6 +57,7 @@ def search_display_candidate(page: ft.Page):
     # file
     candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
     category_df = pd.read_csv(path + file_path['category_data'])
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
 
     name_enc = candidate_df['name'].to_list()
     cat_enc_dict = {}
@@ -74,7 +75,7 @@ def search_display_candidate(page: ft.Page):
             if search_entry.value.lower() in i.lower():
                 if name_enc.index(i) not in data_in:
                     row_can_data_list.append(ViewCandidateRecord(page, main_column1, name_enc.index(i),
-                                                                 candidate_df, category_dict))
+                                                                 candidate_df, category_dict, ele_ser_1))
                     data_in.append(name_enc.index(i))
 
         for j in list(cat_enc_dict.keys()):
@@ -82,7 +83,7 @@ def search_display_candidate(page: ft.Page):
                 for k in list(candidate_df[candidate_df.category == cat_enc_dict[j]].index.values):
                     if k not in data_in:
                         row_can_data_list.append(ViewCandidateRecord(page, main_column1, k,
-                                                                     candidate_df, category_dict))
+                                                                     candidate_df, category_dict, ele_ser_1))
                         data_in.append(k)
 
         column_1.controls = row_can_data_list
@@ -96,6 +97,7 @@ def display_candidate(page):
     # file
     candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
     category_df = pd.read_csv(path + file_path['category_data'])
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
 
     category_dict = {}
     for i in range(len(category_df)):
@@ -120,7 +122,7 @@ def display_candidate(page):
         page.update()
     else:
         for i in range(len(candidate_df.index)):
-            row_can_data_list.append(ViewCandidateRecord(page, main_column1, i, candidate_df, category_dict))
+            row_can_data_list.append(ViewCandidateRecord(page, main_column1, i, candidate_df, category_dict, ele_ser_1))
         column_1.expand = True
         search_entry.disabled = False
         column_1.scroll = ft.ScrollMode.ADAPTIVE
@@ -131,13 +133,14 @@ def display_candidate(page):
 
 class ViewCandidateRecord(ft.UserControl):
 
-    def __init__(self, page, column, index_val, candidate_df, category_dict):
+    def __init__(self, page, column, index_val, candidate_df, category_dict, election_set):
         super().__init__()
         self.page = page
         self.index_val = index_val
         self.column = column
         self.candidate_data_df = candidate_df
         self.category_dict = category_dict
+        self.election_set = election_set
 
     def edit(self, e):
         from .candidate_edit import candidate_edit_page
@@ -158,35 +161,39 @@ class ViewCandidateRecord(ft.UserControl):
             ),
         )
 
-        single_box_row = ft.Card(
+        single_box_row = ft.ListTile(
+            leading=self_icon,
+            title=ft.Text(
+                value=f"{self.candidate_data_df.at[self.index_val, 'name']}",
+                font_family='Verdana',
+            ),
+            subtitle=ft.Text(
+                value=f"{self.category_dict[self.candidate_data_df.at[self.index_val, 'category']]}",
+                font_family='Verdana',
+            ),
+            on_click=self.profile,
+        )
+
+        if not self.election_set.at[0, 'final_nomination']:
+            single_box_row.trailing = ft.PopupMenuButton(
+                icon=ft.icons.MORE_VERT_ROUNDED,
+                items=[
+                    ft.PopupMenuItem(
+                        text="Edit",
+                        icon=ft.icons.EDIT_ROUNDED,
+                        on_click=self.edit
+                    ),
+                    ft.PopupMenuItem(
+                        text="Delete",
+                        icon=ft.icons.DELETE_ROUNDED,
+                        on_click=self.delete
+                    ),
+                ],
+            )
+
+        return ft.Card(
             ft.Container(
-                ft.ListTile(
-                    leading=self_icon,
-                    title=ft.Text(
-                        value=f"{self.candidate_data_df.at[self.index_val, 'name']}",
-                        font_family='Verdana',
-                    ),
-                    subtitle=ft.Text(
-                        value=f"{self.category_dict[self.candidate_data_df.at[self.index_val, 'category']]}",
-                        font_family='Verdana',
-                    ),
-                    trailing=ft.PopupMenuButton(
-                        icon=ft.icons.MORE_VERT_ROUNDED,
-                        items=[
-                            ft.PopupMenuItem(
-                                text="Edit",
-                                icon=ft.icons.EDIT_ROUNDED,
-                                on_click=self.edit
-                            ),
-                            ft.PopupMenuItem(
-                                text="Delete",
-                                icon=ft.icons.DELETE_ROUNDED,
-                                on_click=self.delete
-                            ),
-                        ],
-                    ),
-                    on_click=self.profile,
-                ),
+                single_box_row,
                 padding=ft.padding.symmetric(vertical=3.5),
                 blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
                 border_radius=10,
@@ -194,5 +201,3 @@ class ViewCandidateRecord(ft.UserControl):
             elevation=0,
             color=ft.colors.with_opacity(0.4, '#44CCCCCC')
         )
-
-        return single_box_row

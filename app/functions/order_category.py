@@ -5,7 +5,7 @@ import pandas as pd
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
 from ..functions.dialogs import loading_dialogs
-from ..service.firebase.firestore import update_category_data
+from ..service.firebase.firestore import update_election_data
 
 list_category = []
 
@@ -91,7 +91,7 @@ def order_category_option(page: ft.Page):
         page.update()
         if len(list_category) > 0:
             dig = loading_dialogs(page, "Updating...")
-            update_category_data(list_category)
+            update_election_data(list_category)
             from ..pages.election_settings import update_election_set
             dig.open = False
             page.update()

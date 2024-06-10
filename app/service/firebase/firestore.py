@@ -115,7 +115,7 @@ def update_appdata_name(data: dict) -> None:
     home_data.to_json(path + file_path['app_data'], orient='table', index=False)
 
 
-def update_category_data(data: list) -> None:
+def update_election_data(data: list) -> None:
     db = firestore.client()
     category_df = pd.read_csv(path + file_path['category_data'])
     ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
@@ -125,18 +125,28 @@ def update_category_data(data: list) -> None:
         category_dict[category_df.at[i, 'category_name']] = category_df.at[i, 'category_id']
 
     for i, n in enumerate(data):
-        db.collection('category').document(category_dict[n]).update({'order': i+1})
+        db.collection('category').document(category_dict[n]).update({'order': i + 1})
+        category_dict.pop(n)
+
+    for i in list(category_dict.keys()):
+        if i not in data:
+            db.collection('category').document(category_dict[i]).update({'order': None})
 
     election_dict = {
-        "vote_option": True,
         "final_nomination": True,
         "lock_data": True,
     }
     db.collection('settings').document('election_settings').update(election_dict)
-    ele_ser_1.at[0, 'vote_option'] = True
     ele_ser_1.at[0, 'final_nomination'] = True
     ele_ser_1.at[0, 'lock_data'] = True
     ele_ser_1.to_json(path + file_path['election_settings'], orient='table', index=False)
     create_category()
 
 
+def update_vote_option(value: bool) -> None:
+    db = firestore.client()
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
+
+    db.collection('settings').document('election_settings').update({'vote_option': value})
+    ele_ser_1.at[0, 'vote_option'] = value
+    ele_ser_1.to_json(path + file_path['election_settings'], orient='table', index=False)

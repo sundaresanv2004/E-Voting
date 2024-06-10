@@ -1,5 +1,6 @@
 import flet as ft
 
+from .vote_login import vote_login_page
 from ..functions.manage_database import manage_db_dialogs
 from .connect_server import connect_server_page
 from .create_account import create_account_page
@@ -37,6 +38,11 @@ def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: 
         animations(170)
         connect_server_page(page, content_image, content_column)
 
+    def on_vote(e):
+        page.remove(settings_button)
+        animations(170)
+        vote_login_page(page, content_image, content_column)
+
     if new_start():
         list_menu_button = [
             ft.ElevatedButton(
@@ -66,6 +72,7 @@ def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: 
                 text="Vote",
                 height=50,
                 width=250,
+                on_click=on_vote,
             ),
         ]
 

@@ -117,12 +117,14 @@ def category_dialogs(page: ft.Page):
         width=780,
     )
 
-    category_dialogs1.actions = [
-        ft.TextButton(
-            text="Add new category",
-            on_click=add_cat,
-        )
-    ]
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
+    if not ele_ser_1.at[0, 'final_nomination']:
+        category_dialogs1.actions = [
+            ft.TextButton(
+                text="Add new category",
+                on_click=add_cat,
+            )
+        ]
 
     # Open dialog
     page.dialog = category_dialogs1

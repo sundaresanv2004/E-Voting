@@ -3,6 +3,8 @@ import pandas as pd
 
 import app.service.user.login_auth as cc
 from .candidate_add import candidate_add_page
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
 from ..service.files.manage_files import create_category, create_candidate, remove_files
 
 old_data = None
@@ -21,6 +23,7 @@ def menubar_page(page: ft.Page) -> None:
     )
 
     def on_option_click(e):
+        ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
         page.splash = ft.ProgressBar()
         global old_data
 
@@ -31,10 +34,11 @@ def menubar_page(page: ft.Page) -> None:
                 container.image_src = "/images/background-3.png"
                 home.icon = None
             elif old_data == 1:
-                try:
-                    page.remove(add_candidate_button)
-                except ValueError:
-                    pass
+                if not ele_ser_1.at[0, 'final_nomination']:
+                    try:
+                        page.remove(add_candidate_button)
+                    except ValueError:
+                        pass
                 candidate.icon = None
             elif old_data == 2:
                 election.icon = None
@@ -54,7 +58,8 @@ def menubar_page(page: ft.Page) -> None:
             candidate.icon = ft.icons.SUPERVISED_USER_CIRCLE
             from .candidate_home import candidate_home_page
             candidate_home_page(page, main_column)
-            page.add(add_candidate_button)
+            if not ele_ser_1.at[0, 'final_nomination']:
+                page.add(add_candidate_button)
         elif e == 2:
             election.icon = ft.icons.HOW_TO_VOTE
             from .election_settings import election_settings_page

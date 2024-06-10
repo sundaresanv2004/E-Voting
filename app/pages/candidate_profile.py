@@ -14,6 +14,8 @@ def candidate_profile_page(page: ft.Page, id_val):
 
     candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
     category_df = pd.read_csv(path + file_path['category_data'])
+    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
+
     category_dict = {}
     for i in range(len(category_df)):
         category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
@@ -191,12 +193,14 @@ def candidate_profile_page(page: ft.Page, id_val):
             height=370,
             width=750,
         ),
-        actions=[
-            edit_button,
-            delete_button,
-        ],
         actions_alignment=ft.MainAxisAlignment.END,
     )
+
+    if not ele_ser_1.at[0, 'final_nomination']:
+        alertdialog.actions = [
+            edit_button,
+            delete_button,
+        ]
 
     page.dialog = alertdialog
     alertdialog.open = True
