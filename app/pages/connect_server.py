@@ -2,7 +2,6 @@ import flet as ft
 import re
 from time import sleep
 
-
 from ..functions.forgot_password import forgot_password_dialog
 from ..functions.snack_bar import snackbar
 from ..service.firebase.firestore import system_data
@@ -60,6 +59,8 @@ def connect_server_page(page: ft.Page, content_image: ft.Container, content_colu
                     if val is True:
                         if verify_code_email(page, mail_id_entry.value, "Your One-Time Verification Code"):
                             system_data(page, True)
+                            content_image.height = 0
+                            content_column.disabled = False
                             content_column.clean()
                             page.update()
                             from .all_done import all_done_page

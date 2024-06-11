@@ -5,12 +5,14 @@ import app.service.user.login_auth as cc
 from .candidate_add import candidate_add_page
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
-from ..service.files.manage_files import create_category, create_candidate, remove_files
+from ..service.files.manage_files import create_category, create_candidate, remove_files, create_election_settings
 
 old_data = None
 
 
 def menubar_page(page: ft.Page) -> None:
+    create_election_settings()
+
     def add_candidate_page_fun(e):
         candidate_add_page(page)
 
