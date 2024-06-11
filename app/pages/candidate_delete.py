@@ -15,7 +15,7 @@ def delete_candidate_dialogs(page: ft.Page, index_df, view):
         delete_candidate_dialogs1.open = False
         page.update()
         from .candidate_home import display_candidate
-        delete_candidate(index_df)
+        delete_candidate(page, index_df)
         page.snack_bar = False
         snackbar(page, "Successfully Deleted.")
         page.update()

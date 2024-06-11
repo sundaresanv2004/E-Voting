@@ -15,7 +15,7 @@ def create_user(page, info_dict: dict):
     except firebase_admin._auth_utils.EmailAlreadyExistsError:
         message_dialogs(page, 'EmailAlreadyExistsError')
     except Exception as e:
-        network_error(page, e)
+        network_error(page, e, "normal")
         breakpoint()
 
 
@@ -37,5 +37,5 @@ def update_password(page, uid, new_password) -> None:
     except firebase_admin._auth_utils.UserNotFoundError:
         pass
     except Exception as e:
-        network_error(page, e)
+        network_error(page, e, 'normal')
         breakpoint()

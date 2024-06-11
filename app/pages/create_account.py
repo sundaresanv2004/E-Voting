@@ -237,11 +237,11 @@ def sign_up_page(page: ft.Page, content_image: ft.Container, content_column: ft.
                                     "email": mail_id_entry.value,
                                 })
 
-                                app_data([
+                                app_data(page, [
                                     institution_name,
                                     election_name
                                 ])
-                                system_data(True)
+                                system_data(page, True)
                                 content_column.clean()
                                 page.update()
                                 from .all_done import all_done_page

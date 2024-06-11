@@ -2,10 +2,11 @@ import flet as ft
 import pandas as pd
 
 from .category import category_dialogs
-from .election_options import category_order, vote_options, \
-    download_nomination  # , forgot_code, generate_result, result_view_dialogs
+from .election_options import category_order, vote_options, download_nomination, view_results, download_result
+from .summary_view import summary_view_page
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
+from ..service.firebase.realtime_db import read_vote_data
 
 ele_option_data_update = None
 
@@ -81,7 +82,7 @@ class ElectionSettingsMenu:
                 ),
                 subtitle=self.tot_no_vote,
                 trailing=self.next_icon,
-                # on_click=lambda _: result_view_dialogs(self.page),
+                on_click=lambda _: view_results(self.page, read_vote_data(self.page)),
             ),
             border_radius=10,
             padding=ft.padding.symmetric(vertical=3.5),
@@ -102,7 +103,7 @@ class ElectionSettingsMenu:
                     font_family='Verdana',
                 ),
                 trailing=self.next_icon,
-                # on_click=lambda _: summary_view_page(self.page),
+                on_click=lambda _: summary_view_page(self.page, read_vote_data(self.page)),
             ),
             border_radius=10,
             padding=ft.padding.symmetric(vertical=3.5),
@@ -123,7 +124,7 @@ class ElectionSettingsMenu:
                     value=f"Download result",
                 ),
                 trailing=self.next_icon,
-                # on_click=lambda _: download_result(self.page),
+                on_click=lambda _: download_result(self.page, read_vote_data(self.page)),
             ),
             blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
             border_radius=10,
@@ -181,6 +182,8 @@ class ElectionSettingsMenu:
             self.download_nomination.disabled = True
 
         if self.ele_ser_1.at[0, 'result']:
+            election_df = read_vote_data(self.page)
+            self.tot_no_vote.value = f"Total no.of votes: {sum(list(election_df.loc[0].values))}"
             self.view_result.disabled = False
             self.summary_view_result.disabled = False
             self.download_result.disabled = False

@@ -51,7 +51,7 @@ def menubar_page(page: ft.Page) -> None:
             container.image_src = "/images/background-2.png"
             home.icon = ft.icons.HOME_ROUNDED
             create_candidate()
-            create_category()
+            create_category(page)
             from .home import home_page
             home_page(page, main_column)
         elif e == 1:

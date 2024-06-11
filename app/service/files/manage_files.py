@@ -29,16 +29,16 @@ def create_connection_json(config_dict: dict, file_name) -> None:
     election_data(config_dict['projectId'], path_t, path_k)
 
 
-def create_appdata_json() -> None:
+def create_appdata_json(page) -> None:
     from ..firebase.firestore import read_home_data
 
-    df = pd.DataFrame(read_home_data(), index=[0])
+    df = pd.DataFrame(read_home_data(page), index=[0])
     df.to_json(path + file_path['app_data'], orient='table', index=False)
 
 
-def create_category() -> None:
+def create_category(page) -> None:
     from ..firebase.firestore import read_category_data
-    dict_data = read_category_data()
+    dict_data = read_category_data(page)
     if len(dict_data) == 0:
         df = pd.DataFrame(columns=['EMPTY TABLE'])
     else:
@@ -62,7 +62,7 @@ def create_election_settings() -> None:
     df.to_json(path + file_path['election_settings'], orient='table', index=False)
 
 
-def vote_setup() -> str:
+def vote_setup(page) -> str:
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
     path_election = path + rf"/data/e/{setting_ser.at['election_name', 'values']}"
 
@@ -78,7 +78,7 @@ def vote_setup() -> str:
         candidate_df.to_json(path_election + r'/candidate_data.json', index=False, orient='table')
         candidate_df.reset_index(inplace=True, drop=True)
 
-        category_data = read_category_data()
+        category_data = read_category_data(page)
         category_df = pd.DataFrame(list(category_data.values()), index=list(category_data.keys()))
         category_df.dropna(inplace=True)
         category_df = category_df.astype({'order': int})
@@ -116,7 +116,7 @@ def election_data_file(path_election: str) -> None:
     election_log.to_json(path_election + r'/election_datalog.json', orient='table', index=False)
 
 
-def vote_end(path_election) -> None:
+def vote_end(page, path_election) -> None:
     election_log = pd.read_json(path_election + r'/election_datalog.json', orient='table')
     vote_data_df = pd.read_csv(path_election + election_log.at[0, 'file_name'])
     if not vote_data_df.empty:
@@ -132,7 +132,7 @@ def vote_end(path_election) -> None:
             for j in candidate[candidate.category == category_dict[i]].values:
                 column1 = list(vote_data_df[i].values).count(str(j[0]))
                 new_dict[j[0]] = column1
-        vote_set(new_dict, path_election)
+        vote_set(page, new_dict, path_election)
         # election_log.at[index_val, 'upload_status'] = True
         # election_log.to_json(path_election + r'/election_datalog.json', orient='table', index=False)
 

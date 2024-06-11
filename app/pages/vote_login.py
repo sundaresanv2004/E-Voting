@@ -6,10 +6,11 @@ import pandas as pd
 from ..functions.snack_bar import snackbar
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
-from ..service.files.manage_files import vote_setup
+from ..service.files.manage_files import vote_setup, create_election_settings
 
 
 def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: ft.Column):
+    create_election_settings()
     def back(e):
         from .start_menu import start_menu_page
         content_image.height = 370
@@ -55,10 +56,10 @@ def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: 
                     button_container.opacity = 0.5
                     page.update()
                     from ..service.user.login_auth import check_login
-                    val = check_login(mail_id_entry.value, password_entry.value)
+                    val = check_login(page, mail_id_entry.value, password_entry.value)
                     sleep(1)
                     if val is True:
-                        election_path = vote_setup()
+                        election_path = vote_setup(page)
                         from .vote_home import vote_start_page
                         page.clean()
                         page.window_maximized = True

@@ -11,7 +11,9 @@ from ..service.files.manage_files import create_election_settings
 
 
 def start_menu_page(page: ft.Page, content_image: ft.Container, content_column: ft.Column):
-    create_election_settings()
+    if not new_start:
+        create_election_settings()
+
     settings_button = ft.FloatingActionButton(
         icon=ft.icons.CLOUD_SYNC_ROUNDED,
         tooltip="Manage Firebase Connection",

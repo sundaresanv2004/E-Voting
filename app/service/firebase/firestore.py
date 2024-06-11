@@ -13,16 +13,13 @@ from ..files.manage_files import create_category
 from ...functions.dialogs import network_error
 
 
-def app_data(info_list: list) -> None:
-    db = firestore.client()
+def app_data(page, info_list: list) -> None:
     dict_data = {
         "institution_name": info_list[0],
         "election_name": info_list[1],
         "created_at": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
         "app_version": "6.06"
     }
-
-    db.collection('settings').document('appdata').set(dict_data)
 
     election_dict = {
         "vote_option": False,
@@ -34,12 +31,18 @@ def app_data(info_list: list) -> None:
         "created_at": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
 
-    db.collection('settings').document('election_settings').set(election_dict)
+    try:
+        db = firestore.client()
+        db.collection('settings').document('election_settings').set(election_dict)
+        db.collection('settings').document('appdata').set(dict_data)
+    except Exception as e:
+        network_error(page, e, "normal")
+        breakpoint()
 
 
-def system_data(status: bool) -> None:
+def system_data(page, status: bool) -> None:
     setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-    db = firestore.client()
+
     system_info = {
         'name': platform.node(),
         'os': platform.system(),
@@ -60,20 +63,30 @@ def system_data(status: bool) -> None:
         system_id = setting_ser.loc['system_id'].values[0]
 
     system_info['system_id'] = system_id
-    db.collection('system_data').document(system_id).set(system_info)
 
     ele_data = pd.read_csv(path + file_path['election_data'], index_col='election_name')
     ele_data.at[connect_firebase.election_name, 'authenticated'] = True
     ele_data.to_csv(path + file_path['election_data'], index=True)
 
+    try:
+        db = firestore.client()
+        db.collection('system_data').document(system_id).set(system_info)
+    except Exception as e:
+        network_error(page, e, "normal")
+        breakpoint()
 
-def read_home_data() -> dict:
-    db = firestore.client()
-    collections = db.collection('settings').document('appdata').get().to_dict()
-    return collections
+
+def read_home_data(page) -> dict:
+    try:
+        db = firestore.client()
+        collections = db.collection('settings').document('appdata').get().to_dict()
+        return collections
+    except Exception as e:
+        network_error(page, e, "normal")
+        breakpoint()
 
 
-def read_category_data() -> dict:
+def read_category_data(page) -> dict:
     db = firestore.client()
     collections = db.collection('category')
     dict1 = {}
@@ -88,8 +101,7 @@ def read_election_settings() -> dict:
     return collections
 
 
-def add_category_data(category) -> None:
-    db = firestore.client()
+def add_category_data(page, category) -> None:
     category_id = str(uuid.uuid4())
     category_dict = {
         'category_id': category_id,
@@ -97,7 +109,14 @@ def add_category_data(category) -> None:
         'order': None,
         'created_at': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     }
-    db.collection('category').document(category_id).set(category_dict)
+
+    try:
+        db = firestore.client()
+        db.collection('category').document(category_id).set(category_dict)
+
+    except Exception as e:
+        network_error(page, e, "normal")
+        breakpoint()
 
     category_df = pd.read_csv(path + file_path['category_data'])
     if category_df.empty is False:
@@ -115,7 +134,7 @@ def update_appdata_name(data: dict) -> None:
     home_data.to_json(path + file_path['app_data'], orient='table', index=False)
 
 
-def update_election_data(data: list) -> None:
+def update_election_data(page, data: list) -> None:
     db = firestore.client()
     category_df = pd.read_csv(path + file_path['category_data'])
     ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
@@ -140,7 +159,7 @@ def update_election_data(data: list) -> None:
     ele_ser_1.at[0, 'final_nomination'] = True
     ele_ser_1.at[0, 'lock_data'] = True
     ele_ser_1.to_json(path + file_path['election_settings'], orient='table', index=False)
-    create_category()
+    create_category(page)
 
 
 def update_vote_option(value: bool) -> None:
@@ -162,6 +181,10 @@ def get_system_data() -> pd.DataFrame:
     return df
 
 
-def update_result() -> None:
-    db = firestore.client()
-    db.collection('settings').document('election_settings').update({'result': True})
+def update_result(page) -> None:
+    try:
+        db = firestore.client()
+        db.collection('settings').document('election_settings').update({'result': True})
+    except Exception as e:
+        network_error(page, e, "normal")
+        breakpoint()

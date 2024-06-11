@@ -1,40 +1,62 @@
-from time import sleep
 import flet as ft
 import pandas as pd
 
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
-from app.service.firebase.realtime_db import get_image_url
 
-index_val, ver_val = None, None
+index_v = None
 
 
-def candidate_profile_page(page: ft.Page, id_val):
-    global index_val
+def summary_view_page(page: ft.Page, vote_df: pd.DataFrame):
+    global index_v
+    setting_ser = pd.read_json(path + file_path['settings'], orient='table')
+    path_election = path + rf"/data/e/{setting_ser.at['election_name', 'values']}"
 
-    candidate_data_df = pd.read_json(path + file_path["candidate_data"], orient='table')
-    category_df = pd.read_csv(path + file_path['category_data'])
-    ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
+    candidate_image_destination = path_election + r'/'
+    final_category_data2 = pd.read_csv(path_election + r'/category_data.csv')
+    category_list2 = list(final_category_data2['category_name'])
+    candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
+    cat_enc_dict = {}
+    for i in range(len(final_category_data2)):
+        cat_enc_dict[final_category_data2.at[i, 'category_id']] = final_category_data2.at[i, 'category_name']
 
-    category_dict = {}
-    for i in range(len(category_df)):
-        category_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
+    result = pd.DataFrame(columns=['id', 'candidate_name', 'category', 'image', 'no_of_votes'])
+
+    for i in range(len(candidate_df)):
+        if candidate_df.at[i, 'candidate_id'] in vote_df.columns.to_list():
+            result.loc[i] = [
+                candidate_df.at[i, 'candidate_id'],
+                candidate_df.at[i, 'name'],
+                cat_enc_dict[candidate_df.at[i, 'category']],
+                candidate_df.at[i, 'image'],
+                sum(vote_df[candidate_df.at[i, 'candidate_id']].to_list())
+            ]
+
+    temp_sum_df = pd.DataFrame(columns=['id', 'candidate_name', 'category', 'image', "no_of_votes"])
+    index_a = 0
+    for i in category_list2:
+        df_1 = result[result.category == i]
+        max_val = df_1['no_of_votes'].max()
+        c_ = df_1[df_1.no_of_votes == max_val].values
+        for k in c_:
+            temp_sum_df.loc[index_a] = k
+            index_a += 1
 
     def on_close(e):
-        alertdialog.open = False
+        summary_view_profile.open = False
         page.update()
 
-    index_val = id_val
+    index_v = 0
 
     def next_fun(e):
-        global index_val
-        index_val += 1
+        global index_v
+        index_v += 1
         content_change()
         page.update()
 
     def back_fun(e):
-        global index_val
-        index_val -= 1
+        global index_v
+        index_v -= 1
         content_change()
         page.update()
 
@@ -61,84 +83,72 @@ def candidate_profile_page(page: ft.Page, id_val):
     )
 
     def button_check():
-        if index_val == 0:
+        if index_v == 0:
             back_button.disabled = True
         else:
             back_button.disabled = False
 
-        if index_val == candidate_data_df.index.max():
+        if index_v == temp_sum_df.index.max():
             next_button.disabled = True
         else:
             next_button.disabled = False
 
-    def delete_on_click(e):
-        alertdialog.open = False
-        page.update()
-        from .candidate_delete import delete_candidate_dialogs
-        delete_candidate_dialogs(page, index_val, True)
-
-    def edit_on_click(e):
-        alertdialog.open = False
-        page.update()
-        sleep(0.2)
-        from .candidate_edit import candidate_edit_page
-        candidate_edit_page(page, index_val, True)
-
     title1 = ft.Text(
         weight=ft.FontWeight.W_500,
-        size=20,
         font_family='Verdana',
+        size=20,
     )
 
     name_text = ft.Text(
-        size=20,
         font_family='Verdana',
+        size=20,
     )
 
     category_text = ft.Text(
-        size=20,
         font_family='Verdana',
+        size=20,
     )
 
-    added_on_text = ft.Text(
-        size=20,
+    no_of_vote = ft.Text(
         font_family='Verdana',
-    )
-
-    added_by_text = ft.Text(
         size=20,
-        font_family='Verdana',
     )
 
     def content_change():
-        global ver_val
+        global index_v
+        user_data = temp_sum_df.loc[index_v].values
         button_check()
-        title1.value = f"Candidate ID: {candidate_data_df.at[index_val, 'candidate_id']}"
-        name_text.value = f"Name: {candidate_data_df.at[index_val, 'name']}"
-        category_text.value = f"Category: {category_dict[candidate_data_df.at[index_val, 'category']]}"
-        added_on_text.value = f"Created on: {candidate_data_df.at[index_val, 'created_at']}"
-        added_by_text.value = f"Updated on: {candidate_data_df.at[index_val, 'updated_at']}"
-        container.content = ft.Text()
-        container.image_src = get_image_url(page, candidate_data_df.at[index_val, 'image'])
-        container.image_fit = ft.ImageFit.COVER
+        title1.value = f"Candidate ID: {user_data[0]}"
+        name_text.value = f"Name: {user_data[1]}"
+        category_text.value = f"Category: {user_data[2]}"
+        no_of_vote.value = f"No.of votes: {user_data[4]}"
+
+        if user_data[3] != False:
+            container.content = ft.Text()
+            container.image_src = candidate_image_destination + f'{user_data[3]}'
+            container.image_fit = ft.ImageFit.COVER
+        else:
+            container.image_src = None
+            container.content = ft.Column(
+                [
+                    ft.Icon(
+                        name=ft.icons.ACCOUNT_CIRCLE_ROUNDED,
+                        size=40,
+                    ),
+                    ft.Text(
+                        value="Image not found",
+                        font_family='Verdana',
+                    ),
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                height=250,
+                width=200,
+            )
 
     content_change()
 
-    edit_button = ft.TextButton(
-        text="Edit",
-        icon=ft.icons.EDIT_ROUNDED,
-        tooltip="Edit",
-        on_click=edit_on_click,
-    )
-
-    delete_button = ft.TextButton(
-        text="Delete",
-        icon=ft.icons.DELETE_ROUNDED,
-        tooltip='Delete',
-        on_click=delete_on_click,
-    )
-
-    alertdialog = ft.AlertDialog(
+    summary_view_profile = ft.AlertDialog(
         modal=True,
         content=ft.Column(
             [
@@ -171,8 +181,7 @@ def candidate_profile_page(page: ft.Page, id_val):
                                     [
                                         name_text,
                                         category_text,
-                                        added_on_text,
-                                        added_by_text,
+                                        no_of_vote,
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
                                 ),
@@ -192,16 +201,9 @@ def candidate_profile_page(page: ft.Page, id_val):
             ],
             height=370,
             width=750,
-        ),
-        actions_alignment=ft.MainAxisAlignment.END,
+        )
     )
 
-    if not ele_ser_1.at[0, 'final_nomination']:
-        alertdialog.actions = [
-            edit_button,
-            delete_button,
-        ]
-
-    page.dialog = alertdialog
-    alertdialog.open = True
+    page.dialog = summary_view_profile
+    summary_view_profile.open = True
     page.update()

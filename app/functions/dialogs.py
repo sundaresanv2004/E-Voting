@@ -78,11 +78,16 @@ def message_dialogs(page: ft.Page, message_key: str):
     page.update()
 
 
-def network_error(page: ft.Page, error: Exception):
+def network_error(page: ft.Page, error: Exception, curr_page):
     def on_retry(e):
-        from main import main
-        page.clean()
-        main(page)
+        alertdialog.open = False
+        page.update()
+        if curr_page == 'vote':
+            pass
+        else:
+            from main import main
+            page.clean()
+            main(page)
 
     alertdialog = ft.AlertDialog(
         modal=True,
@@ -145,7 +150,6 @@ def network_error(page: ft.Page, error: Exception):
     alertdialog.open = True
     page.update()
 
-    # return alertdialog
 
 
 def error_dialogs(page: ft.Page, error_key: str):

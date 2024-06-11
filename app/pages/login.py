@@ -51,7 +51,7 @@ def login_page(page: ft.Page, content_image: ft.Container, content_column: ft.Co
                     button_container.opacity = 0.5
                     page.update()
                     from ..service.user.login_auth import check_login
-                    val = check_login(mail_id_entry.value, password_entry.value)
+                    val = check_login(page, mail_id_entry.value, password_entry.value)
                     sleep(1)
                     if val is True:
                         from .menubar import menubar_page

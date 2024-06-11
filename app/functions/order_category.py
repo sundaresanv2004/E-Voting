@@ -91,7 +91,7 @@ def order_category_option(page: ft.Page):
         page.update()
         if len(list_category) > 0:
             dig = loading_dialogs(page, "Updating...")
-            update_election_data(list_category)
+            update_election_data(page, list_category)
             from ..pages.election_settings import update_election_set
             dig.open = False
             page.update()

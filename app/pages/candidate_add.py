@@ -114,7 +114,7 @@ def build(page: ft.Page):
         from ..functions.snack_bar import snackbar
         index_val = category_df[category_df.category_name == category_dropdown.value].index.values[0]
         category = category_df.at[index_val, 'category_id']
-        add_candidate([
+        add_candidate(page, [
             name_entry.value,
             category,
             list_cand_data[2],

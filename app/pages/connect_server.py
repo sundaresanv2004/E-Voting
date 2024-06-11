@@ -55,15 +55,16 @@ def connect_server_page(page: ft.Page, content_image: ft.Container, content_colu
                     button_container.opacity = 0.5
                     page.update()
                     from ..service.user.login_auth import check_login
-                    val = check_login(mail_id_entry.value, password_entry.value)
+                    val = check_login(page, mail_id_entry.value, password_entry.value)
                     sleep(1)
                     if val is True:
                         if verify_code_email(page, mail_id_entry.value, "Your One-Time Verification Code"):
-                            system_data(True)
+                            system_data(page, True)
+                            content_column.clean()
+                            page.update()
+                            from .all_done import all_done_page
+                            all_done_page(page, content_column)
                             snackbar(page, "Successfully connected to the server")
-                            page.clean()
-                            from main import main
-                            main(page)
                         else:
                             button_container.content = ft.Text("Connect Server")
                             button_container.opacity = 1

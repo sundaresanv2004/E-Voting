@@ -47,7 +47,7 @@ def vote_exit(page: ft.Page, election_path) -> None:
         exit_confirm_dialog.title = None
         page.update()
         from app.service.files.manage_files import vote_end
-        vote_end(election_path)
+        vote_end(page, election_path)
         page.update()
         page.window_full_screen = False
         page.update()

@@ -41,7 +41,7 @@ def start_connection(page):
     try:
         data = auth.list_users()
     except Exception as e:
-        network_error(page, e)
+        network_error(page, e, 'normal')
         breakpoint()
 
     if len(data.users) == 0:

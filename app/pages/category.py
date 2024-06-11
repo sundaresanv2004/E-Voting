@@ -9,7 +9,7 @@ from app.service.firebase.firestore import add_category_data
 
 
 def category_dialogs(page: ft.Page):
-    create_category()
+    create_category(page)
 
     category_dialogs1 = ft.AlertDialog(
         modal=True,
@@ -152,7 +152,7 @@ def category_add_page(page: ft.Page, page_view):
             if category_entry.value not in category_list:
                 category_entry.error_text = None
                 category_entry.update()
-                add_category_data(category_entry.value)
+                add_category_data(page, category_entry.value)
                 from ..functions.snack_bar import snackbar
                 on_close(e)
                 snackbar(page, "Successfully Added")

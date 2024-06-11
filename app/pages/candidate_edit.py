@@ -139,6 +139,7 @@ def build(page: ft.Page, index_val, page_view):
             list_cand_data_edit[2] = False
 
         edit_candidate(
+            page,
             index_val,
             [name_entry.value,
              category_dict[category_dropdown.value],
@@ -212,7 +213,7 @@ def build(page: ft.Page, index_val, page_view):
         category_dropdown.value = list_cand_data_edit[1]
 
     if list_cand_data_edit[2] is not None:
-        container.image_src = get_image_url(list_cand_data_edit[2])
+        container.image_src = get_image_url(page, list_cand_data_edit[2])
         container.content = None
 
     def pick_files_result(e: ft.FilePickerResultEvent):
@@ -236,7 +237,7 @@ def build(page: ft.Page, index_val, page_view):
                 list_cand_data_edit[1] = ''
                 error_dialogs(page, "002")
         else:
-            container.image_src = get_image_url(list_cand_data_edit[2])
+            container.image_src = get_image_url(page, list_cand_data_edit[2])
             container.update()
         disable_button(e)
 
