@@ -265,9 +265,7 @@ class VoteUser(ft.UserControl):
         else:
             try:
                 election_log = pd.read_json(self.election_path + r'/election_datalog.json', orient='table')
-                df1 = election_log[election_log.active_status == True]
-                index_val = df1.index.values[0]
-                vote_data_path = self.election_path + election_log.at[index_val, 'file_name']
+                vote_data_path = self.election_path + election_log.at[0, 'file_name']
                 election_data3 = pd.read_csv(vote_data_path)
                 election_data3.loc['a'] = temp_list
                 election_data3.to_csv(vote_data_path, index=False)
@@ -294,7 +292,6 @@ class VoteUser(ft.UserControl):
             image_fit=ft.ImageFit.COVER,
         )
 
-        print(self.candidate_image_destination + self.candidate_df.at[can_data, 'image'])
         img_container.image_src = self.candidate_image_destination + rf"/{ self.candidate_df.at[can_data, 'image']}"
 
         def on_hover_animate(e):

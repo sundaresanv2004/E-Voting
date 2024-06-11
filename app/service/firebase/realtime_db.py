@@ -82,3 +82,23 @@ def edit_candidate(candidate_index: int, candidate_data: list) -> None:
 def download_image(image_path: str, download_path: str) -> None:
     storage = connect_firebase.firebase.storage()
     storage.child(image_path).download(image_path, download_path)
+
+
+def vote_set(data_dict: dict, path_election) -> None:
+    setting_ser = pd.read_json(path + file_path['settings'], orient='table')
+    election_log = pd.read_json(path_election + r'/election_datalog.json', orient='table')
+    election_settings = pd.read_json(path + file_path['election_settings'], orient='table')
+    db = connect_firebase.firebase.database()
+
+    if pd.isna(election_log.at[0, 'uploaded_on']):
+        db.child("vote_data").child(setting_ser.at['system_id', 'values']).set(data_dict, cc.auth_data['idToken'])
+    else:
+        db.child("vote_data").child(setting_ser.at['system_id', 'values']).update(data_dict, cc.auth_data['idToken'])
+
+    if not election_settings.at[0, 'result']:
+        from app.service.firebase.firestore import update_result
+        update_result()
+
+    election_log.at[0, 'upload_status'] = True
+    election_log.at[0, 'uploaded_on'] = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    election_log.to_json(path_election + r'/election_datalog.json', index=False, orient='table')

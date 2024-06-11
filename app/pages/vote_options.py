@@ -48,7 +48,7 @@ def vote_exit(page: ft.Page, election_path) -> None:
         page.update()
         from app.service.files.manage_files import vote_end
         vote_end(election_path)
-        # on_no(e)
+        page.update()
         page.window_full_screen = False
         page.update()
         page.window_maximized = True
@@ -85,11 +85,8 @@ def vote_done(page: ft.Page, appbar, main_column, election_path):
         exit_confirm_dialog.open = False
         page.update()
         election_log = pd.read_json(election_path + r'/election_datalog.json', orient='table')
-        df1 = election_log[election_log.active_status == True]
-        index_val = df1.index.values[0]
-
-        file_destination = path + rf'/backup{election_log.at[index_val, "file_name"]}'
-        shutil.copy(election_path + election_log.at[index_val, 'file_name'], file_destination)
+        file_destination = path + rf'/backup{election_log.at[0, "file_name"]}'
+        shutil.copy(election_path + election_log.at[0, 'file_name'], file_destination)
         from .vote_home import vote_content_page
         vote_content_page(page, appbar, main_column, election_path)
 

@@ -160,3 +160,8 @@ def get_system_data() -> pd.DataFrame:
         dict1[doc.id] = doc.to_dict()
     df = pd.DataFrame(list(dict1.values()), index=list(dict1.keys()))
     return df
+
+
+def update_result() -> None:
+    db = firestore.client()
+    db.collection('settings').document('election_settings').update({'result': True})

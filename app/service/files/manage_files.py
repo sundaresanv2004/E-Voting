@@ -9,7 +9,7 @@ from datetime import datetime
 
 from .check_installation import path
 from .local_files_scr import file_path
-from ..firebase.realtime_db import download_image
+from ..firebase.realtime_db import download_image, vote_set
 
 
 def upload_config_file(file_source_path, file_name) -> None:
@@ -93,7 +93,11 @@ def vote_setup() -> str:
             image_path = candidate_df.at[i, 'image']
             download_image(image_path, path_election + rf"/{image_path}")
 
-    election_data_file(path_election)
+        election_data_file(path_election)
+    else:
+        election_log = pd.read_json(path_election + r'/election_datalog.json', orient='table')
+        election_log.at[0, 'upload_status'] = False
+        election_log.to_json(path_election + r'/election_datalog.json', index=False, orient='table')
 
     return path_election
 
@@ -114,15 +118,23 @@ def election_data_file(path_election: str) -> None:
 
 def vote_end(path_election) -> None:
     election_log = pd.read_json(path_election + r'/election_datalog.json', orient='table')
-    df1 = election_log[election_log.active_status == True]
-    index_val = df1.index.values[0]
-    vote_data_df = pd.read_csv(path_election + election_log.at[index_val, 'file_name'])
-    if vote_data_df.empty:
-        election_log.at[index_val, 'active_status'] = False
-        election_log.at[index_val, 'upload_status'] = True
-        election_log.to_json(path_election + r'/election_datalog.json', orient='table', index=False)
-    else:
-        print(vote_data_df)
+    vote_data_df = pd.read_csv(path_election + election_log.at[0, 'file_name'])
+    if not vote_data_df.empty:
+        category_df = pd.read_csv(path_election + r'/category_data.csv')
+        candidate = pd.read_json(path_election + r'/candidate_data.json', orient='table')
+
+        category_dict = {}
+        for i in range(len(category_df)):
+            category_dict[category_df.at[i, 'category_name']] = category_df.at[i, 'category_id']
+
+        new_dict = {}
+        for i in vote_data_df.columns.values:
+            for j in candidate[candidate.category == category_dict[i]].values:
+                column1 = list(vote_data_df[i].values).count(str(j[0]))
+                new_dict[j[0]] = column1
+        vote_set(new_dict, path_election)
+        # election_log.at[index_val, 'upload_status'] = True
+        # election_log.to_json(path_election + r'/election_datalog.json', orient='table', index=False)
 
 
 def remove_files() -> None:

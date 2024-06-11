@@ -61,6 +61,7 @@ def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: 
                         election_path = vote_setup()
                         from .vote_home import vote_start_page
                         page.clean()
+                        page.window_maximized = True
                         page.update()
                         page.window_full_screen = True
                         page.update()
