@@ -4,7 +4,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import zipfile
 import shutil
-import subprocess
 
 # Determine the OS and set the path
 if platform.system() == "Windows":
@@ -21,29 +20,6 @@ version = "6.08"
 run_folder = os.path.join(path, 'run')
 versions_folder = os.path.join(path, 'versions')
 local_zip = '6.08.zip'  # Change this to your actual local zip file path
-requirements_file = 'requirements.txt'  # Change this to your actual requirements.txt file path
-
-
-def create_virtualenv_and_install():
-    # Create run folder and virtual environment
-    if not os.path.exists(run_folder):
-        os.makedirs(run_folder)
-        python_executable = shutil.which("python3" if os_sys != "Windows" else "python")
-        if not python_executable:
-            raise EnvironmentError("Python executable not found. Please install Python.")
-        subprocess.check_call([python_executable, "-m", "venv", run_folder])
-
-    # Determine the pip executable path
-    pip_executable = os.path.join(run_folder, 'bin', 'pip') if os_sys != "Windows" else os.path.join(run_folder,
-                                                                                                     'Scripts',
-                                                                                                     'pip.exe')
-
-    # Verify the pip executable exists
-    if not os.path.exists(pip_executable):
-        raise FileNotFoundError(f"{pip_executable} not found. Virtual environment may not have been created correctly.")
-
-    # Install requirements
-    subprocess.check_call([pip_executable, 'install', '-r', requirements_file])
 
 
 def check_and_extract_version():
@@ -57,11 +33,15 @@ def check_and_extract_version():
             extracted_folder_name = zip_ref.namelist()[0].split('/')[0]
             os.rename(os.path.join(versions_folder, extracted_folder_name), version_folder)
 
+    # Move the pre-created virtual environment
+    run_env_folder = os.path.join(version_folder, 'run')
+    if os.path.exists(run_env_folder):
+        shutil.move(run_env_folder, run_folder)
+
 
 def on_install():
     progress.start()
     try:
-        create_virtualenv_and_install()
         check_and_extract_version()
         progress.stop()
         messagebox.showinfo("Success", "Installation completed successfully!")
