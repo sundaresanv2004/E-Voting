@@ -23,7 +23,7 @@ def installation_requirement():
             os.makedirs(path + r'/data/e')
             os.makedirs(path + r'/data/s')
             os.makedirs(path + r'/server/connection')
-            os.makedirs(path + r'/backup')
+            os.makedirs(path + r'/backup/vote_data')
             settings_ser = pd.Series(default_setting_data)
             settings_ser.to_json(path + file_path['settings'], orient='table', index=True)
             ele_data_ = pd.DataFrame(columns=['election_name', 'connection_path', 'key_path', 'authenticated'])

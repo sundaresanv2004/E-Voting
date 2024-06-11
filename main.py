@@ -60,12 +60,12 @@ def main(page: ft.Page):
         )
     )
 
-    # page.add(bg_container)
+    page.add(bg_container)
     check_connection_files(page)
-    create_election_settings()
-    check_login('admin@gmail.com', 'admin1234')
-    menubar_page(page)
-    # start_menu_page(page, content_image, content_column)
+    # create_election_settings()
+    # check_login('admin@gmail.com', 'admin1234')
+    # menubar_page(page)
+    start_menu_page(page, content_image, content_column)
 
 
 if __name__ == '__main__':

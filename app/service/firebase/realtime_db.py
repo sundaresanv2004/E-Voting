@@ -77,3 +77,8 @@ def edit_candidate(candidate_index: int, candidate_data: list) -> None:
     candidate_df.at[candidate_index, 'updated_at'] = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     db.child('candidates').child(candidate_id).update(data_dict, cc.auth_data['idToken'])
     candidate_df.to_json(path + file_path['candidate_data'], index=False, orient='table')
+
+
+def download_image(image_path: str, download_path: str) -> None:
+    storage = connect_firebase.firebase.storage()
+    storage.child(image_path).download(image_path, download_path)

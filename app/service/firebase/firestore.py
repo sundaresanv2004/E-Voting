@@ -150,3 +150,13 @@ def update_vote_option(value: bool) -> None:
     db.collection('settings').document('election_settings').update({'vote_option': value})
     ele_ser_1.at[0, 'vote_option'] = value
     ele_ser_1.to_json(path + file_path['election_settings'], orient='table', index=False)
+
+
+def get_system_data() -> pd.DataFrame:
+    db = firestore.client()
+    collections = db.collection('system_data')
+    dict1 = {}
+    for doc in collections.stream():
+        dict1[doc.id] = doc.to_dict()
+    df = pd.DataFrame(list(dict1.values()), index=list(dict1.keys()))
+    return df

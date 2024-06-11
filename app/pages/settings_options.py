@@ -3,6 +3,7 @@ import pandas as pd
 
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
+from ..service.firebase.firestore import get_system_data
 
 
 def institution_name_dialogs(page: ft.Page):
@@ -258,3 +259,121 @@ def election_name_dialogs(page: ft.Page):
     page.update()
 
 
+def system_dialogs(page: ft.Page):
+    system_df = get_system_data()
+    system_df.reset_index(inplace=True, drop=True)
+    category_dialogs1 = ft.AlertDialog(
+        modal=True,
+        actions_alignment=ft.MainAxisAlignment.END,
+    )
+
+    def on_close(e):
+        category_dialogs1.open = False
+        page.update()
+
+    # Table
+    category_data_table = ft.DataTable(
+        column_spacing=20,
+        expand=True,
+        columns=[
+            ft.DataColumn(ft.Text("#")),
+            ft.DataColumn(ft.Text("System ID")),
+            ft.DataColumn(ft.Text("System Name")),
+            ft.DataColumn(ft.Text("OS")),
+            ft.DataColumn(ft.Text("Added On")),
+        ],
+    )
+
+    system_data_row: list = []
+    if len(system_df) != 0:
+        for i in range(len(system_df)):
+            system_data_row.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(value=f"{i + 1}")),
+                        ft.DataCell(ft.Tooltip(
+                            message=f"{system_df.at[i, 'system_id']}",
+                            content=ft.Text(
+                                value=f"{system_df.at[i, 'system_id'][0:9]}...",
+                                font_family="Verdana"
+                            ),
+                        )),
+                        ft.DataCell(ft.Text(value=f"{system_df.at[i, 'name']}", font_family="Verdana")),
+                        ft.DataCell(ft.Text(value=f"{system_df.at[i, 'os']}", font_family="Verdana")),
+                        ft.DataCell(ft.Text(value=f"{system_df.at[i, 'date_added']}", font_family="Verdana")),
+                    ],
+                )
+            )
+
+    category_data_table.rows = system_data_row
+    data_list1: list = [
+        ft.Row(
+            [
+                category_data_table,
+            ],
+        )
+    ]
+
+    if len(system_df) == 0:
+        data_list1.append(
+            ft.Row(
+                [
+                    ft.Text(
+                        value="No Records",
+                        size=20,
+                    )
+                ],
+                width=700,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+            )
+        )
+
+    # AlertDialog data
+    category_dialogs1.content = ft.Column(
+        [
+            ft.Container(
+                ft.Column(
+                    [
+                        ft.Row(
+                            [
+                                ft.Row(
+                                    [
+                                        ft.Text(
+                                            value="Connected Devices",
+                                            weight=ft.FontWeight.BOLD,
+                                            size=25,
+                                            font_family='Verdana',
+                                        ),
+                                    ],
+                                    expand=True,
+                                ),
+                                ft.Row(
+                                    [
+                                        ft.IconButton(
+                                            icon=ft.icons.CLOSE_ROUNDED,
+                                            tooltip="Close",
+                                            on_click=on_close,
+                                        )
+                                    ]
+                                )
+                            ],
+                            width=940,
+                        ),
+                        ft.Column(
+                            controls=data_list1,
+                        )
+                    ]
+                ),
+                padding=ft.padding.only(0, 0, 8, 0)
+            )
+        ],
+        scroll=ft.ScrollMode.ADAPTIVE,
+        height=550,
+        width=950,
+    )
+
+    # Open dialog
+    page.dialog = category_dialogs1
+    category_dialogs1.open = True
+    page.update()

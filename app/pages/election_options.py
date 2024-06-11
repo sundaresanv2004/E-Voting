@@ -89,8 +89,9 @@ def download_nomination(page: ft.Page):
                     candidate_df.drop(i, inplace=True, axis=0)
 
             new_df = candidate_df[['candidate_id', 'name', 'category', 'created_at', 'updated_at']]
+            new_df.reset_index(inplace=True, drop=True)
             try:
-                new_df.to_csv(path_download, index=False)
+                new_df.to_csv(path_download, index=True)
             except PermissionError:
                 error_dialogs(page, '003')
             page.remove(save_file_dialog)

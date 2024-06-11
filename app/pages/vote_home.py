@@ -2,12 +2,10 @@ from time import sleep
 import flet as ft
 import pandas as pd
 
-import Main.service.scr.election_scr as ee
-from Main.functions.error_message import error_message_dialogs
-from Main.functions.troubleshooting import election_data_missing
-from Main.pages.vote_options import vote_exit, vote_done
-from Main.service.scr.check_installation import path
-from Main.service.scr.loc_file_scr import file_data, file_path
+from .vote_options import vote_exit, vote_done
+from ..functions.dialogs import error_message_dialogs
+from ..service.files.check_installation import path
+from ..service.files.local_files_scr import file_path
 
 category_text = ft.Text(
     size=35,
@@ -42,7 +40,7 @@ image_not_found = ft.Column(
 )
 
 
-def vote_start_page(page: ft.Page):
+def vote_start_page(page: ft.Page, election_path):
     main_column = ft.Column(expand=True)
 
     appbar = ft.Container(
@@ -67,17 +65,10 @@ def vote_start_page(page: ft.Page):
 
     page.add(container)
     page.update()
-    vote_content_page(page, appbar, main_column)
+    vote_content_page(page, appbar, main_column, election_path)
 
 
-election_data_loc = rf'/{file_data["vote_data"]}/{file_data["election_data"]}'
-
-
-def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Column):
-    def on_hover_color(e):
-        e.control.bgcolor = "#0369a1" if e.data == "true" else "#0ea5e9"
-        e.control.update()
-
+def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Column, election_path: str):
     def on_vote_click(e):
         appbar.content = None
         main_column.clean()
@@ -101,26 +92,29 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
             height=60,
         )
         page.update()
-        user_vote_start(page, appbar, main_column)
+        user_vote_start(page, appbar, main_column, election_path)
 
     app_data_df = pd.read_json(path + file_path['app_data'], orient='table')
-    election_data2 = None
+    election_log = pd.read_json(election_path + r'/election_datalog.json', orient='table')
+    df1 = election_log[election_log.active_status == True]
+    index_val = df1.index.values[0]
+    vote_data_path = election_path + rf"/{election_log.at[index_val, 'file_name']}"
+
     try:
-        election_data2 = pd.read_json(ee.current_election_path + election_data_loc, orient='table')
+        election_data3 = pd.read_csv(vote_data_path)
     except pd.errors.ParserError as e:
         error_message_dialogs(page, str(e))
     except pd.errors.EmptyDataError as e:
         error_message_dialogs(page, str(e))
     except Exception as e:
         error_message_dialogs(page, str(e))
-    ele_ser12 = pd.read_json(ee.current_election_path + fr"/{file_data['election_settings']}", orient='table')
 
     appbar.content = ft.Row(
         [
             ft.Row(
                 [
                     ft.Text(
-                        value=app_data_df[app_data_df.topic == 'institution_name'].values[0][1],
+                        value=app_data_df.at[0, 'institution_name'],
                         size=40,
                         font_family='Verdana',
                         color='#172554',
@@ -138,7 +132,7 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
                         tooltip="Logout",
                         icon_size=30,
                         icon_color='#172554',
-                        on_click=lambda _: vote_exit(page),
+                        on_click=lambda _: vote_exit(page, election_path),
                     )
                 ]
             ),
@@ -146,10 +140,6 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
         ],
         height=60,
     )
-
-    if len(election_data2) == 1:
-        ele_ser12.loc['completed'] = True
-        ele_ser12.to_json(ee.current_election_path + fr"/{file_data['election_settings']}", orient='table', index=True)
 
     main_column.controls = [
         ft.Column(
@@ -164,36 +154,27 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
                     content=ft.Column(
                         [
                             ft.Text(
-                                value=ele_ser12.loc['election-name'].values[0],
+                                value=app_data_df.at[0, 'election_name'],
                                 size=30,
                                 font_family='Verdana',
                                 color='#172554',
                                 weight=ft.FontWeight.W_800,
                             ),
                             ft.Text(
-                                value=f"Vote No: {len(election_data2) + 1}",
+                                value=f"Vote No: {len(election_data3)}",
                                 size=30,
                                 font_family='Verdana',
                                 color='#172554',
                                 weight=ft.FontWeight.W_800,
                             ),
                             ft.Row(height=10),
-                            ft.Container(
+                            ft.FloatingActionButton(
+
+                                text="Start Voting",
                                 width=250,
                                 height=50,
-                                border_radius=10,
-                                bgcolor="#0ea5e9",
-                                alignment=ft.alignment.center,
-                                on_hover=on_hover_color,
-                                content=ft.Text(
-                                    value="Vote",
-                                    size=20,
-                                    color=ft.colors.WHITE,
-                                    font_family='Verdana',
-                                    weight=ft.FontWeight.W_500,
-                                ),
                                 on_click=on_vote_click,
-                                animate=ft.animation.Animation(100, ft.AnimationCurve.DECELERATE)
+
                             ),
                         ],
                         spacing=20,
@@ -214,22 +195,25 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
     page.update()
 
 
-def user_vote_start(page: ft.Page, appbar: ft.Container, main_column: ft.Column):
+def user_vote_start(page: ft.Page, appbar: ft.Container, main_column: ft.Column, election_path):
     global category_text, page_text, curr_data
-    final_category_data1 = pd.read_csv(
-        ee.current_election_path + rf'/{file_data["vote_data"]}/{file_data["final_category"]}')
-    candidate_df = pd.read_json(
-        ee.current_election_path + rf'/{file_data["vote_data"]}/{file_data["final_nomination"]}',
-        orient='table')
-    category_list = list(final_category_data1['category'])
 
-    category_text.value = f" Category: {category_list[curr_data]}  "
+    final_category_data1 = pd.read_csv(election_path + r'/category_data.csv')
+    candidate_df = pd.read_json(election_path + r'/candidate_data.json', orient='table')
+
+    category_dict = {}
+    for i in range(len(final_category_data1)):
+        category_dict[final_category_data1.at[i, 'category_id']] = final_category_data1.at[i, 'category_name']
+
+    category_list = list(final_category_data1['category_id'])
+
+    category_text.value = f" Category: {category_dict[category_list[curr_data]]}  "
     page_text.value = f"Page: {curr_data + 1}of{len(category_list)}"
     page_text.update()
     df1 = candidate_df[candidate_df.category == category_list[curr_data]].values
     content_list = []
     for i in range(len(df1)):
-        content_list.append(VoteUser(page, df1[i][0], appbar, main_column))
+        content_list.append(VoteUser(page, df1[i][0], appbar, main_column, election_path))
 
     main_column.controls = [
         ft.Column(
@@ -257,19 +241,17 @@ def user_vote_start(page: ft.Page, appbar: ft.Container, main_column: ft.Column)
 
 
 class VoteUser(ft.UserControl):
-    def __init__(self, page: ft.Page, can_id, appbar: ft.Container, main_column: ft.Column):
+    def __init__(self, page: ft.Page, can_id, appbar: ft.Container, main_column: ft.Column, election_path):
         super().__init__()
         self.page = page
         self.can_id = can_id
         self.appbar = appbar
         self.main_column = main_column
-        self.candidate_df = pd.read_json(
-            ee.current_election_path + rf'/{file_data["vote_data"]}/{file_data["final_nomination"]}',
-            orient='table')
-        self.candidate_image_destination = ee.current_election_path + r'/images'
-        final_category_data2 = pd.read_csv(
-            ee.current_election_path + rf'/{file_data["vote_data"]}/{file_data["final_category"]}')
-        self.category_list1 = list(final_category_data2['category'])
+        self.candidate_df = pd.read_json(election_path + r'/candidate_data.json', orient='table')
+        self.candidate_image_destination = election_path
+        final_category_data2 = pd.read_csv(election_path + r'/category_data.csv')
+        self.category_list1 = list(final_category_data2['category_name'])
+        self.election_path = election_path
 
     def on_user_click(self, e):
         global temp_list, curr_data
@@ -279,12 +261,16 @@ class VoteUser(ft.UserControl):
             curr_data += 1
             sleep(0.1)
             self.main_column.clean()
-            user_vote_start(self.page, self.appbar, self.main_column)
+            user_vote_start(self.page, self.appbar, self.main_column, self.election_path)
         else:
             try:
-                election_data3 = pd.read_json(ee.current_election_path + election_data_loc, orient='table')
+                election_log = pd.read_json(self.election_path + r'/election_datalog.json', orient='table')
+                df1 = election_log[election_log.active_status == True]
+                index_val = df1.index.values[0]
+                vote_data_path = self.election_path + election_log.at[index_val, 'file_name']
+                election_data3 = pd.read_csv(vote_data_path)
                 election_data3.loc['a'] = temp_list
-                election_data3.to_json(ee.current_election_path + election_data_loc, orient='table', index=False)
+                election_data3.to_csv(vote_data_path, index=False)
             except pd.errors.ParserError as e:
                 error_message_dialogs(self.page, str(e))
             except pd.errors.EmptyDataError as e:
@@ -295,10 +281,10 @@ class VoteUser(ft.UserControl):
             temp_list = []
             self.main_column.clean()
             sleep(0.1)
-            vote_done(self.page, self.appbar, self.main_column)
+            vote_done(self.page, self.appbar, self.main_column, self.election_path)
 
     def build(self):
-        can_data = self.candidate_df[self.candidate_df.id == self.can_id].values[0]
+        can_data = self.candidate_df[self.candidate_df.candidate_id == self.can_id].index.values[0]
 
         img_container = ft.Container(
             width=240,
@@ -307,10 +293,9 @@ class VoteUser(ft.UserControl):
             border_radius=ft.border_radius.only(top_left=10, top_right=10),
             image_fit=ft.ImageFit.COVER,
         )
-        if can_data[5] is False:
-            img_container.content = image_not_found
-        else:
-            img_container.image_src = self.candidate_image_destination + rf'/{can_data[5]}'
+
+        print(self.candidate_image_destination + self.candidate_df.at[can_data, 'image'])
+        img_container.image_src = self.candidate_image_destination + rf"/{ self.candidate_df.at[can_data, 'image']}"
 
         def on_hover_animate(e):
             e.control.scale = 1.1 if e.data == "true" else 1
@@ -329,7 +314,7 @@ class VoteUser(ft.UserControl):
                     ft.Row(
                         [
                             ft.Text(
-                                value=can_data[1],
+                                value=self.candidate_df.at[can_data, 'name'],
                                 size=20,
                                 weight=ft.FontWeight.W_700,
                             )

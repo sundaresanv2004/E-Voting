@@ -3,9 +3,10 @@ from time import sleep
 import flet as ft
 import pandas as pd
 
-from ..functions.forgot_password import forgot_password_dialog
+from ..functions.snack_bar import snackbar
 from ..service.files.check_installation import path
 from ..service.files.local_files_scr import file_path
+from ..service.files.manage_files import vote_setup
 
 
 def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: ft.Column):
@@ -57,10 +58,13 @@ def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: 
                     val = check_login(mail_id_entry.value, password_entry.value)
                     sleep(1)
                     if val is True:
-                        from .menubar import menubar_page
+                        election_path = vote_setup()
+                        from .vote_home import vote_start_page
                         page.clean()
-                        menubar_page(page)
-                        from ..functions.snack_bar import snackbar
+                        page.update()
+                        page.window_full_screen = True
+                        page.update()
+                        vote_start_page(page, election_path)
                         snackbar(page, "Successfully logged in.")
                     else:
                         button_container.content = ft.Text("Sign In")
@@ -179,12 +183,8 @@ def vote_login_page(page: ft.Page, content_image: ft.Container, content_column: 
                         icon=ft.icons.ARROW_BACK_IOS_NEW_ROUNDED,
                         on_click=back,
                     ),
-                    ft.TextButton(
-                        text="Forgot Password?",
-                        on_click=lambda e: forgot_password_dialog(page),
-                    ),
                 ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                alignment=ft.MainAxisAlignment.START,
                 width=450,
             ),
             bgcolor='#44CCCCCC',

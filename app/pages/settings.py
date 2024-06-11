@@ -1,7 +1,7 @@
 import flet as ft
 import pandas as pd
 
-from .settings_options import institution_name_dialogs, election_name_dialogs, help_dialogs
+from .settings_options import institution_name_dialogs, election_name_dialogs, help_dialogs, system_dialogs
 from ..functions.manage_database import manage_db_dialogs
 from ..functions.snack_bar import snackbar
 from ..service.files.check_installation import path
@@ -14,6 +14,7 @@ class SettingsMenu:
 
     def __init__(self, page: ft.Page):
         super().__init__()
+        self.systems = None
         self.page = page
         self.app_data = pd.read_json(path + file_path['app_data'], orient='table')
         self.election_name = None
@@ -131,11 +132,32 @@ class SettingsMenu:
                 border_radius=10,
                 padding=ft.padding.symmetric(vertical=3.5),
             ),
+            color=ft.colors.with_opacity(0.5, '#44CCCCCC'),
+            elevation=0,
+        )
+
+        return self.project
+
+    def system_connected(self):
+        self.systems = ft.Card(
+            ft.Container(
+                ft.ListTile(
+                    title=ft.Text(
+                        value=f"Connected Devices",
+                        font_family='Verdana',
+                    ),
+                    on_click=lambda _: system_dialogs(self.page),
+                    trailing=self.next_icon,
+                ),
+                blur=ft.Blur(20, 20, ft.BlurTileMode.MIRROR),
+                border_radius=10,
+                padding=ft.padding.symmetric(vertical=3.5),
+            ),
             elevation=0,
             color=ft.colors.with_opacity(0.5, '#44CCCCCC'),
         )
 
-        return self.project
+        return self.systems
 
     def change_in_data(self):
         self.app_data = pd.read_json(path + file_path['app_data'], orient='table')
@@ -157,6 +179,7 @@ def settings_page(page: ft.Page, main_column: ft.Column):
                 option_menu.institution_name_option(),
                 option_menu.election_name_option(),
                 option_menu.manage_connection_option(),
+                option_menu.system_connected(),
                 option_menu.create_project(),
                 option_menu.help_option(),
             ],
