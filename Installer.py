@@ -1,69 +1,129 @@
 import os
 import platform
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
-import zipfile
-import shutil
-
-# Determine the OS and set the path
-if platform.system() == "Windows":
-    os_sys = "Windows"
-    path = os.getenv('APPDATA') + r'/E-Voting'
-elif platform.system() == 'Darwin':
-    os_sys = platform.system()
-    path = os.path.expanduser('~') + r"/Library/Application Support/E-Voting"
-else:
-    raise EnvironmentError("Unsupported platform")
-
-# Set version and paths
-version = "6.08"
-run_folder = os.path.join(path, 'run')
-versions_folder = os.path.join(path, 'versions')
-local_zip = '6.08.zip'  # Change this to your actual local zip file path
 
 
-def check_and_extract_version():
-    if not os.path.exists(versions_folder):
-        os.makedirs(versions_folder)
+class InstallerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Installer")
 
-    version_folder = os.path.join(versions_folder, version)
-    if not os.path.exists(version_folder):
-        with zipfile.ZipFile(local_zip, 'r') as zip_ref:
-            zip_ref.extractall(versions_folder)
-            extracted_folder_name = zip_ref.namelist()[0].split('/')[0]
-            os.rename(os.path.join(versions_folder, extracted_folder_name), version_folder)
+        self.progress_label = tk.Label(root, text="Starting installation...")
+        self.progress_label.pack(pady=10)
 
-    # Move the pre-created virtual environment
-    run_env_folder = os.path.join(version_folder, 'run')
-    if os.path.exists(run_env_folder):
-        shutil.move(run_env_folder, run_folder)
+        self.progress_bar = ttk.Progressbar(root, orient="horizontal", mode="determinate", maximum=100)
+        self.progress_bar.pack(fill=tk.X, padx=20, pady=10)
+
+        self.progress_text = tk.Text(root, height=10, wrap='word')
+        self.progress_text.pack(fill=tk.BOTH, padx=20, pady=10)
+
+        self.run_installation()
+
+    def log(self, message):
+        self.progress_text.insert(tk.END, message + '\n')
+        self.progress_text.see(tk.END)
+        self.root.update()
+
+    def update_progress(self, value):
+        self.progress_bar['value'] = value
+        self.root.update()
+
+    def run_installation(self):
+        threading.Thread(target=self.installation_process).start()
+
+    def installation_process(self):
+        try:
+            self.log("Determining platform and setting path...")
+            if platform.system() == "Windows":
+                path = Path(os.getenv('APPDATA')) / 'E-Voting'
+            elif platform.system() == 'Darwin':
+                path = Path.home() / 'Library' / 'Application Support' / 'E-Voting'
+            else:
+                self.log("Unsupported platform")
+                return
+
+            run_path = path / 'run'
+            venv_path = run_path / 'venv'
+            requirements_path = Path('requirements.txt')
+            app_version = '6.08'
+            zip_filename = f"{app_version}.zip"
+            zip_path = Path(zip_filename)
+            versions_path = path / 'versions'
+            extract_to = versions_path / app_version
+
+            self.log("Ensuring the installation path exists...")
+            path.mkdir(parents=True, exist_ok=True)
+
+            self.update_progress(10)
+
+            if not run_path.exists():
+                self.log("'run' directory does not exist. Creating...")
+                run_path.mkdir()
+                self.create_virtualenv_and_install_requirements(venv_path, requirements_path)
+            else:
+                self.log("'run' directory already exists, skipping virtual environment creation.")
+
+            self.update_progress(50)
+
+            self.log("Ensuring the versions path exists...")
+            versions_path.mkdir(parents=True, exist_ok=True)
+
+            if extract_to.exists():
+                self.log(f"Version {app_version} is already installed.")
+                messagebox.showinfo("Already Installed", f"Version {app_version} is already installed.")
+            else:
+                if zip_path.exists():
+                    self.log(f"Extracting {zip_filename} to {extract_to}...")
+                    self.extract_and_move_zip(zip_path, extract_to)
+                    self.log("Installation completed successfully.")
+                    messagebox.showinfo("Success", "Installation completed successfully.")
+                else:
+                    self.log(f"Zip file {zip_filename} does not exist, skipping extraction.")
+
+            self.update_progress(100)
+            self.root.after(2000, self.root.destroy)
+        except subprocess.CalledProcessError as e:
+            self.log(f"Error during subprocess call: {e}")
+            messagebox.showerror("Subprocess Error", f"An error occurred during subprocess execution: {e}")
+            self.root.after(2000, self.root.destroy)
+        except Exception as e:
+            self.log(f"Error: {e}")
+            messagebox.showerror("Error", str(e))
+            self.root.after(2000, self.root.destroy)
+
+    def create_virtualenv_and_install_requirements(self, venv_path, requirements_path):
+        self.log(f"Creating virtual environment at {venv_path}...")
+        subprocess.check_call([sys.executable, '-m', 'venv', str(venv_path)])
+        pip_executable = venv_path / 'bin' / 'pip' if platform.system() == 'Darwin' else venv_path / 'Scripts' / 'pip.exe'
+
+        self.log(f"Installing requirements from {requirements_path}...")
+        try:
+            subprocess.check_call([str(pip_executable), 'install', '-r', str(requirements_path)])
+        except subprocess.CalledProcessError as e:
+            self.log(f"Error installing requirements: {e}")
+            raise
+
+    def extract_and_move_zip(self, zip_path, extract_to):
+        self.log(f"Extracting {zip_path}...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+
+        self.log(f"Moving contents from the intermediate extraction folder...")
+        intermediate_folder = extract_to / '6.08'
+        if intermediate_folder.exists() and intermediate_folder.is_dir():
+            for item in intermediate_folder.iterdir():
+                target_path = extract_to / item.name
+                item.rename(target_path)
+            intermediate_folder.rmdir()
 
 
-def on_install():
-    progress.start()
-    try:
-        check_and_extract_version()
-        progress.stop()
-        messagebox.showinfo("Success", "Installation completed successfully!")
-        root.after(1000, root.destroy)  # Close the window after 1 second
-    except Exception as e:
-        progress.stop()
-        messagebox.showerror("Error", str(e))
-
-
-# Tkinter GUI setup
-root = tk.Tk()
-root.title("E-Voting Version-6.08 Test")
-
-frame = ttk.Frame(root, padding="10")
-frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-
-ttk.Label(frame, text="E-Voting Version-6.08 Test").grid(row=0, column=0, columnspan=2, pady=10)
-
-progress = ttk.Progressbar(frame, mode='indeterminate')
-progress.grid(row=1, column=0, columnspan=2, pady=10)
-
-install_button = ttk.Button(frame, text="Install", command=on_install)
-install_button.grid(row=2, column=0, columnspan=2, pady=10)
-
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = InstallerApp(root)
+    root.mainloop()

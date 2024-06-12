@@ -100,7 +100,10 @@ def build(page: ft.Page):
                 save_button.disabled = True
         else:
             save_button.disabled = True
-        save_button.update()
+        try:
+            save_button.update()
+        except AssertionError:
+            pass
 
     category_df = pd.read_csv(path + file_path['category_data'])
 
