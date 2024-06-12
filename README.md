@@ -19,7 +19,8 @@ This streamlined process ensures a hassle-free installation experience for users
 ### Version
 
 Version(5.01): [Get Here](https://drive.google.com/file/d/1TXIkfS3dKSFbkvoECO2Utr039laP7BvW/view?usp=drive_link) __This version doesn't required a firebase connection it runs on local system.__
-Version(5.08): [Get Here](https://drive.google.com/file/d/1n5ZQvIKRGL7CWRFkbVBSOEbwRfAu_ZfP/view?usp=drive_link)
+
+Version(6.08): [Get Here](https://drive.google.com/file/d/1n5ZQvIKRGL7CWRFkbVBSOEbwRfAu_ZfP/view?usp=drive_link)
 
 ## Firebase Project Setup Guide
 
