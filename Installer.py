@@ -51,7 +51,7 @@ class InstallerApp:
             run_path = path / 'run'
             venv_path = run_path / 'venv'
             requirements_path = Path('requirements.txt')
-            app_version = '6.08'
+            app_version = '6.08'  # Example version, should be dynamically determined if needed
             zip_filename = f"{app_version}.zip"
             zip_path = Path(zip_filename)
             versions_path = path / 'versions'
@@ -101,6 +101,9 @@ class InstallerApp:
         self.log(f"Creating virtual environment at {venv_path}...")
         subprocess.check_call([sys.executable, '-m', 'venv', str(venv_path)])
         pip_executable = venv_path / 'bin' / 'pip' if platform.system() == 'Darwin' else venv_path / 'Scripts' / 'pip.exe'
+
+        self.log("Ensuring setuptools is installed...")
+        subprocess.check_call([str(pip_executable), 'install', 'setuptools'])
 
         self.log(f"Installing requirements from {requirements_path}...")
         try:

@@ -11,11 +11,9 @@ def run_main_script():
     # Determine the platform and set paths accordingly
     if platform.system() == "Windows":
         base_path = Path(os.getenv('APPDATA')) / 'E-Voting'
-        activate_script = base_path / 'run' / 'venv' / 'Scripts' / 'activate'
         python_executable = base_path / 'run' / 'venv' / 'Scripts' / 'python.exe'
     elif platform.system() == 'Darwin':
         base_path = Path.home() / 'Library' / 'Application Support' / 'E-Voting'
-        activate_script = base_path / 'run' / 'venv' / 'bin' / 'activate'
         python_executable = base_path / 'run' / 'venv' / 'bin' / 'python'
     else:
         print("Unsupported platform")
@@ -29,7 +27,7 @@ def run_main_script():
 
     # Run the main.py script using the virtual environment's python executable
     try:
-        print(f"Running E-Voting version: {app_version}...")
+        print(f"Running E-Voting Version: {app_version}...")
         subprocess.check_call([str(python_executable), str(current_version_path)])
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running main.py: {e}")
