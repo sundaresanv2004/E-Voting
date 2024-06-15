@@ -128,7 +128,7 @@ def menubar_page(page: ft.Page) -> None:
                                 [
                                     ft.CircleAvatar(
                                         content=ft.Text(
-                                            value="sfddsf",# cc.auth_data['displayName'][0].upper(),
+                                            value=cc.auth_data['displayName'][0].upper(),
                                             size=22,
                                         ),
                                     ),

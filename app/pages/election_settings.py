@@ -183,11 +183,7 @@ class ElectionSettingsMenu:
 
         if self.ele_ser_1.at[0, 'result']:
             election_df = read_vote_data(self.page)
-            list1 = []
-            for i in range(len(election_df)):
-                list1.append(sum(list(election_df.loc[i].values)))
-            category_df = pd.read_csv(path + file_path['category_data']).dropna()
-            self.tot_no_vote.value = f"Total no.of votes: {int(sum(list1)/len(category_df))}"
+            self.tot_no_vote.value = f"Total no.of votes: {sum(list(election_df.loc[0].values))}"
             self.view_result.disabled = False
             self.summary_view_result.disabled = False
             self.download_result.disabled = False
