@@ -87,6 +87,7 @@ class InstallerApp:
                     self.log(f"Zip file {zip_filename} does not exist, skipping extraction.")
 
             self.update_progress(100)
+            messagebox.showinfo("Installation Complete", "The application has been successfully installed.")
             self.root.after(2000, self.root.destroy)
         except subprocess.CalledProcessError as e:
             self.log(f"Error during subprocess call: {e}")
@@ -117,16 +118,17 @@ class InstallerApp:
 
     def extract_and_move_zip(self, zip_path, extract_to):
         self.log(f"Extracting {zip_path}...")
+        intermediate_extract_to = extract_to.parent / f"{extract_to.name}_tmp"
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
+            zip_ref.extractall(intermediate_extract_to)
 
-        self.log(f"Moving contents from the intermediate extraction folder...")
-        intermediate_folder = extract_to / '6.08'
-        if intermediate_folder.exists() and intermediate_folder.is_dir():
-            for item in intermediate_folder.iterdir():
-                target_path = extract_to / item.name
-                item.rename(target_path)
-            intermediate_folder.rmdir()
+        self.log(
+            f"Moving contents from the intermediate extraction folder {intermediate_extract_to} to {extract_to}...")
+        for item in intermediate_extract_to.iterdir():
+            target_path = extract_to / item.name
+            item.rename(target_path)
+
+        intermediate_extract_to.rmdir()
 
 
 if __name__ == "__main__":

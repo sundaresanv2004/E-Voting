@@ -1,6 +1,9 @@
 import json
+import os
 
-loc_path = '.'
+from app.service.files.check_installation import path
+
+loc_path = path + rf'/versions/6.08'
 
 
 def read_file(path_file: str) -> dict:

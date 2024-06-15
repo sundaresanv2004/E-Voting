@@ -2,8 +2,6 @@ import platform
 import os
 import pandas as pd
 
-from .local_files_scr import file_path, default_setting_data
-
 
 path = None
 os_sys = None
@@ -17,6 +15,7 @@ elif platform.system() == 'Darwin':
 
 
 def installation_requirement():
+    from .local_files_scr import file_path, default_setting_data
     if not os.path.exists(path + file_path['settings']):
         try:
             os.makedirs(path + r'/data/a')
@@ -33,6 +32,7 @@ def installation_requirement():
 
 
 def new_start() -> bool:
+    from .local_files_scr import file_path
     try:
         ele_data = pd.read_csv(path + file_path['election_data'])
         if ele_data.empty is True:
