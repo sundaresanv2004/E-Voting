@@ -50,8 +50,8 @@ class InstallerApp:
 
             run_path = path / 'run'
             venv_path = run_path / 'venv'
-            requirements_path = Path('requirements.txt')
-            app_version = '6.08'  # Example version, should be dynamically determined if needed
+            requirements_path = Path(__file__).parent / 'requirements.txt'
+            app_version = '6.08'
             zip_filename = f"{app_version}.zip"
             zip_path = Path(zip_filename)
             versions_path = path / 'versions'
@@ -106,6 +106,9 @@ class InstallerApp:
         subprocess.check_call([str(pip_executable), 'install', 'setuptools'])
 
         self.log(f"Installing requirements from {requirements_path}...")
+        if not requirements_path.exists():
+            raise FileNotFoundError(f"Could not find requirements.txt at {requirements_path}")
+
         try:
             subprocess.check_call([str(pip_executable), 'install', '-r', str(requirements_path)])
         except subprocess.CalledProcessError as e:
