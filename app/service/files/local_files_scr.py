@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-loc_path = os.path.dirname(sys.argv[0])
+loc_path = os.getcwd()
 
 
 def read_file(path_file: str) -> dict:
