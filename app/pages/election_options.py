@@ -106,7 +106,7 @@ def download_nomination(page: ft.Page):
 
     # AlertDialog data
     download_nomination_alertdialog1 = ft.AlertDialog(
-        modal=False,
+        modal=True,
         content=ft.Row(
             [
                 ft.Column(
@@ -306,7 +306,7 @@ def download_result(page: ft.Page, vote_df: pd.DataFrame):
 
     # AlertDialog data
     download_result_alertdialog1 = ft.AlertDialog(
-        modal=False,
+        modal=True,
         content=ft.Row(
             [
                 ft.Column(

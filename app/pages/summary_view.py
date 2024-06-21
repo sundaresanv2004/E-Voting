@@ -3,22 +3,25 @@ import pandas as pd
 
 from app.service.files.check_installation import path
 from app.service.files.local_files_scr import file_path
+from app.service.firebase.realtime_db import get_image_url
 
 index_v = None
 
 
 def summary_view_page(page: ft.Page, vote_df: pd.DataFrame):
     global index_v
-    setting_ser = pd.read_json(path + file_path['settings'], orient='table')
-    path_election = path + rf"/data/e/{setting_ser.at['election_name', 'values']}"
 
-    candidate_image_destination = path_election + r'/'
-    final_category_data2 = pd.read_csv(path_election + r'/category_data.csv')
-    category_list2 = list(final_category_data2['category_name'])
+    # candidate_image_destination = path_election + r'/'
+    category_df = pd.read_csv(path + file_path['category_data']).dropna()
+    category_df.dropna(subset=['order'], inplace=True, axis=0, ignore_index=True)
+    category_df.sort_values(by='order', ascending=True, inplace=True, axis=0, ignore_index=True)
+
+    category_list2 = list(category_df['category_name'])
     candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
     cat_enc_dict = {}
-    for i in range(len(final_category_data2)):
-        cat_enc_dict[final_category_data2.at[i, 'category_id']] = final_category_data2.at[i, 'category_name']
+
+    for i in range(len(category_df)):
+        cat_enc_dict[category_df.at[i, 'category_id']] = category_df.at[i, 'category_name']
 
     result = pd.DataFrame(columns=['id', 'candidate_name', 'category', 'image', 'no_of_votes'])
 
@@ -122,30 +125,7 @@ def summary_view_page(page: ft.Page, vote_df: pd.DataFrame):
         name_text.value = f"Name: {user_data[1]}"
         category_text.value = f"Category: {user_data[2]}"
         no_of_vote.value = f"No.of votes: {user_data[4]}"
-
-        if user_data[3] != False:
-            container.content = ft.Text()
-            container.image_src = candidate_image_destination + f'{user_data[3]}'
-            container.image_fit = ft.ImageFit.COVER
-        else:
-            container.image_src = None
-            container.content = ft.Column(
-                [
-                    ft.Icon(
-                        name=ft.icons.ACCOUNT_CIRCLE_ROUNDED,
-                        size=40,
-                    ),
-                    ft.Text(
-                        value="Image not found",
-                        font_family='Verdana',
-                    ),
-                ],
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                alignment=ft.MainAxisAlignment.CENTER,
-                height=250,
-                width=200,
-            )
-
+        container.image_src = get_image_url(page, user_data[3])
     content_change()
 
     summary_view_profile = ft.AlertDialog(

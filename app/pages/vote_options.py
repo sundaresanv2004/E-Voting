@@ -6,7 +6,7 @@ import pandas as pd
 from app.service.files.check_installation import path
 
 
-def vote_exit(page: ft.Page, election_path) -> None:
+def vote_exit(page: ft.Page, election_path, turbo: bool) -> None:
     def on_no(e):
         exit_confirm_dialog.open = False
         page.update()
@@ -66,6 +66,7 @@ def vote_exit(page: ft.Page, election_path) -> None:
             ft.TextButton(
                 "No",
                 on_click=on_no,
+                disabled=turbo,
             ),
             ft.TextButton(
                 "Yes",

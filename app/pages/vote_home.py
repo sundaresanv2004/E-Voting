@@ -103,11 +103,11 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
     try:
         election_data3 = pd.read_csv(vote_data_path)
     except pd.errors.ParserError as e:
-        error_message_dialogs(page, str(e))
+        error_message_dialogs(page, str(e), election_path)
     except pd.errors.EmptyDataError as e:
-        error_message_dialogs(page, str(e))
+        error_message_dialogs(page, str(e), election_path)
     except Exception as e:
-        error_message_dialogs(page, str(e))
+        error_message_dialogs(page, str(e), election_path)
 
     appbar.content = ft.Row(
         [
@@ -132,7 +132,7 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
                         tooltip="Logout",
                         icon_size=30,
                         icon_color='#172554',
-                        on_click=lambda _: vote_exit(page, election_path),
+                        on_click=lambda _: vote_exit(page, election_path, False),
                     )
                 ]
             ),
@@ -140,6 +140,11 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
         ],
         height=60,
     )
+
+    try:
+        len_vote = len(election_data3)
+    except Exception as e:
+        len_vote = 0
 
     main_column.controls = [
         ft.Column(
@@ -161,7 +166,7 @@ def vote_content_page(page: ft.Page, appbar: ft.Container, main_column: ft.Colum
                                 weight=ft.FontWeight.W_800,
                             ),
                             ft.Text(
-                                value=f"Vote No: {len(election_data3)}",
+                                value=f"Vote No: {len_vote}",
                                 size=30,
                                 font_family='Verdana',
                                 color='#172554',
@@ -270,11 +275,11 @@ class VoteUser(ft.UserControl):
                 election_data3.loc['a'] = temp_list
                 election_data3.to_csv(vote_data_path, index=False)
             except pd.errors.ParserError as e:
-                error_message_dialogs(self.page, str(e))
+                error_message_dialogs(self.page, str(e), self.election_path)
             except pd.errors.EmptyDataError as e:
-                error_message_dialogs(self.page, str(e))
+                error_message_dialogs(self.page, str(e), self.election_path)
             except Exception as e:
-                error_message_dialogs(self.page, str(e))
+                error_message_dialogs(self.page, str(e), self.election_path)
             curr_data = 0
             temp_list = []
             self.main_column.clean()

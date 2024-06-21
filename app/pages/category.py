@@ -151,6 +151,7 @@ def category_add_page(page: ft.Page, page_view):
         if len(category_entry.value) != 0:
             if category_entry.value not in category_list:
                 category_entry.error_text = None
+                category_entry.disabled = True
                 category_entry.update()
                 add_category_data(page, category_entry.value)
                 from ..functions.snack_bar import snackbar

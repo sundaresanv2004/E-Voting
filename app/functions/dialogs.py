@@ -1,7 +1,10 @@
+import shutil
 from time import sleep
 
 import flet as ft
+import pandas as pd
 
+from app.service.files.check_installation import path
 from app.service.files.local_files_scr import warnings, error_data
 
 
@@ -181,12 +184,16 @@ def error_dialogs(page: ft.Page, error_key: str):
     page.update()
 
 
-def error_message_dialogs(page: ft.Page, error_key: str):
+def error_message_dialogs(page: ft.Page, error_key: str, election_path):
+    from app.pages.vote_options import vote_exit
 
     def on_ok(e):
         alertdialog.open = False
         page.update()
-        # election_data_missing(page)
+        election_log = pd.read_json(election_path + r'/election_datalog.json', orient='table')
+        file_destination = path + rf'/backup{election_log.at[0, "file_name"]}'
+        shutil.copy(file_destination, election_path + election_log.at[0, 'file_name'])
+        vote_exit(page, election_path, True)
 
     alertdialog = ft.AlertDialog(
         modal=True,

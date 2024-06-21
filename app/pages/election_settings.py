@@ -162,6 +162,9 @@ class ElectionSettingsMenu:
         candidate_df = pd.read_json(path + file_path["candidate_data"], orient='table')
         self.ele_ser_1 = pd.read_json(path + file_path['election_settings'], orient='table')
 
+        category_df = pd.read_csv(path + file_path['category_data']).dropna()
+        df = read_vote_data(self.page)
+
         if candidate_df.empty is False:
             if not self.ele_ser_1.at[0, 'result']:
                 self.final_nomination_list.disabled = False
@@ -183,7 +186,7 @@ class ElectionSettingsMenu:
 
         if self.ele_ser_1.at[0, 'result']:
             election_df = read_vote_data(self.page)
-            self.tot_no_vote.value = f"Total no.of votes: {sum(list(election_df.loc[0].values))}"
+            self.tot_no_vote.value = f"{int(sum(df.sum().values) / len(category_df['category_id']))}"
             self.view_result.disabled = False
             self.summary_view_result.disabled = False
             self.download_result.disabled = False
