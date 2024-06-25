@@ -207,7 +207,7 @@ def error_message_dialogs(page: ft.Page, error_key: str, election_path):
         ),
         actions=[
             ft.TextButton(
-                text="Ok",
+                text="Troubleshoot",
                 on_click=on_ok,
             ),
         ],
