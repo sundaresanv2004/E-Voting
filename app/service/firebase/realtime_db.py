@@ -145,5 +145,4 @@ def read_vote_data(page) -> pd.DataFrame:
         election_df.reset_index(inplace=True, drop=True)
         return election_df
     except Exception as e:
-        network_error(page, e, "normal")
-        breakpoint()
+        pass
