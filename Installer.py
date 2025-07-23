@@ -48,6 +48,7 @@ class InstallerApp:
                 self.log("Unsupported platform")
                 return
 
+            # Path creation
             run_path = path / 'run'
             venv_path = run_path / 'venv'
             requirements_path = Path(__file__).parent / 'requirements.txt'
